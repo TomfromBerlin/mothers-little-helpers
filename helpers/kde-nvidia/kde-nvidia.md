@@ -6,19 +6,29 @@ If you try to use KDE with your Nvidia card with proprietary drivers, you may ru
 
 ![kde-nvidia-scaling-problem2](kde-nvidia-scaling-problem2.png)
 
-The solution is quite simple: open /etc/sddm.conf (e.g. with `sudo nano /etc/sddm.conf`) and add the following argument to the line _ServerArguments=-nolisten tcp_ in section [X11]:
-`-dpi 96`
+As you can see, icons, fonts and almost everything are way to big, and the desktop is more or less unusable.
 
-After editing the line should look like this
+The solution is quite simple: open /etc/sddm.conf (e.g. with `sudo nano /etc/sddm.conf`) and add
+
+```
+-dpi 96
+```
+
+to the line
+
+_**ServerArguments=-nolisten tcp**_
+
+in section `[X11]`:
+
+It should look like this (among other entries):
 
 ```
 [X11]
-
 ServerArguments=-nolisten tcp -dpi 96
 
 ```
 
-After restarting your computer the scaling problem should be gone and you desktop should look like this:
+After restarting your computer the scaling problem should be gone and your desktop look like this:
 
 ![kde-nvidia-scaling-problem](kde-nvidia-no-scaling-problem.jpg)
 
