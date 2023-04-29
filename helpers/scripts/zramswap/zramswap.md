@@ -1,4 +1,4 @@
-# zramswap-install
+# Installation of swapfile in RAM with zram
 
 ## _Usage: `sh zram-install`_
 
