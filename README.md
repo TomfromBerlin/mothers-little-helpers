@@ -24,7 +24,6 @@ Some of the scripts may have their own license, if not, the [MIT license](https:
 
 ## Scripts
 
-- [Countdown](helpers/scripts/functions/countdown.sh)
 - [Installing a compressed swapfile in RAM (zramswap)](helpers/scripts/zramswap/zramswap.md)
 - [Measure loading time of the shell](helpers/scripts/zlt/shlt.md)
 - [what_shell](helpers/scripts/misc/what_shell) - shows the (sub-)shell that is currently used. usage: `source what_shell` (the file should live somewhere in your $PATH)
