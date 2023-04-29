@@ -1,0 +1,40 @@
+################################################################################
+#                                                                              #
+# Copyright 2023 Thomas Bernard (https://github.com/TomfromBerlin)             #
+#                                                                              #
+# Permission is hereby granted, free of charge, to any person obtaining a copy #
+# of this software and associated documentation files (the “Software”), to     #
+# deal in the Software without restriction, including without limitation the   #
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or  #
+# sell copies of the Software, and to permit persons to whom the Software is   #
+# furnished to do so, subject to the following conditions:                     #
+#                                                                              #
+# The above copyright notice and this permission notice shall be included in   #
+# all copies or substantial portions of the Software.                          #
+#                                                                              #
+# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR   #
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,     #
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE  #
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER       #
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING      #
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS #
+# IN THE SOFTWARE.                                                             #
+#                                                                              #
+################################################################################
+#
+# What shell do we have?
+myshell=$(ps -cp "$$" -o command="")
+case "$myshell" in
+  bash) echo -e "Bourne Again Shell ($(ps -cp "$$" -o command=""))  - ver. ${BASH_VERSION}"  ;;
+  sh) echo -e "Bourne Shell ($(ps -cp "$$" -o command=""))"  ;;
+  ash) echo -e "Almquist-Shell ($(ps -cp "$$" -o command=""))"  ;;
+  dash) echo -e "Debian-Almquist-Shell ($(ps -cp "$$" -o command=""))"  ;;
+  ksh) echo -e "Korn Shell ($(ps -cp "$$" -o command="")) - ver. ${KSH_VERSION}"  ;;
+  lksh) echo -e "You should not use Legacy Korn Shell (lksh) as an interactive shell.\nIt is intended exclusively for running legacy scripts.\nUse mksh instead, or zsh and emulate ksh." ;;
+  mksh) echo -e "MirBSD Korn Shell ($(ps -cp "$$" -o command="")) - ver. ${KSH_VERSION}"  ;;
+  pdksh) echo -e "Puplic Domain Korn Shell ($(ps -cp "$$" -o command="")) - ver. ${KSH_VERSION}"  ;;
+  posh) echo -e "Policy-compliant Ordinary SHell ($(ps -cp "$$" -o command="")) - ver. ${POSH_VERSION}"  ;;
+  yash) echo -e "Yet Another Shell ($(ps -cp "$$" -o command="")) - ver. ${YASH_VERSION}"  ;;
+  zsh) echo -e "Z Shell ($(ps -cp "$$" -o command="")) - ver. ${ZSH_VERSION}"  ;;
+  *) echo -e "Unknown Shell - ($(ps -cp "$$" -o command=""))"  ;;
+esac

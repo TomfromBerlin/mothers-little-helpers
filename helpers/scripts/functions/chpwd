@@ -1,0 +1,10 @@
+################################################################################
+#            Everything below this line comes no warranty of any kind.         #
+#                    Use these file at your own risk!                          #
+################################################################################
+#
+# usefull for auto-ls after each directory change
+#
+function chpwd(){
+emulate -L zsh; ls -FA --color=always --group-directories-first;
+}
