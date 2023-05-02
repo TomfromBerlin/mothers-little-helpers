@@ -8,19 +8,19 @@ BLUE='\e[0;34;40m'
 MAGENTA='\e[0;35;40m'
 RESET='\033[0m'
 [[ $(ps -cp "$$" -o command="") != "zsh" ]] && echo -en "$RED" && echo "This script is intended for use in a Z shell environment." && echo -en "$RESET" && exit;
-echo " This script demonstrates the functionality of the PS4 prompt variable.\n For it to work, we need to define this variable:\n (line breaks for readability only)"
-echo -e " PS4='\n   "$GREEN"%F{white}eval depth: %F{green}%e%f\n "$CYAN"- %F{white}exec: %F{cyan}%x%f%\n "$BLUE"- %F{white}source: %F{blue}%N%f%\n "$MAGENTA"- %F{white}line no.: %F{magenta}%I%f\n"$YELLOW" - %F{white}code: %F{yellow} "$RESET"\n'"
+echo -e " This script demonstrates the functionality of the PS4 prompt variable.\n For it to work, we need to define this variable:\n (line breaks for readability only)"
+echo -e " PS4='\n   ""$GREEN""%F{white}eval depth: %F{green}%e%f\n ""$CYAN""- %F{white}exec: %F{cyan}%x%f%\n ""$BLUE""- %F{white}source: %F{blue}%N%f%\n ""$MAGENTA""- %F{white}line no.: %F{magenta}%I%f\n""$YELLOW"" - %F{white}code: %F{yellow} ""$RESET""\n'"
 echo "$RESET"
-echo -e " It will show\n the "$GREEN"evaluation depth$RESET,\n the "$CYAN"name of the executed file"$RESET",\n the"$BLUE" name of the sourced file"$RESET",\n the "$MAGENTA"line no."$RESET",\n the "$YELLOW"executed code"$RESET"\n as well as the"$YELLOW" standard output.\n"
-echo -e " "$RED"We will overwrite any existing definition of PS4, and restore it afterwards.\n If you do not want that, press CTRL-C to exit, or"
-echo -e "\n "$RESET"|------------------------------|\n | "$GREEN"Press any key to continue..."$RESET" |\n |------------------------------|"; read -k1 -s
+echo -e " It will show\n the ""$GREEN""evaluation depth$RESET,\n the ""$CYAN""name of the executed file""$RESET"",\n the""$BLUE"" name of the sourced file""$RESET"",\n the ""$MAGENTA""line no.""$RESET"",\n the ""$YELLOW""executed code""$RESET""\n as well as the""$YELLOW"" standard output.\n"
+echo -e " ""$RED""We will overwrite any existing definition of PS4, and restore it afterwards.\n If you do not want that, press CTRL-C to exit, or"
+echo -e "\n ""$RESET""|------------------------------|\n | ""$GREEN""Press any key to continue...""$RESET"" |\n |------------------------------|"; read -r -k1 -s
 echo ""
-if [[ -n "$PS4" ]]; then PS4_TMP="$PS4" && export PS4_TEMP; fi
+[[ -n "$PS4" ]] && PS4_TMP="$PS4" && export PS4_TMP
 export PS4='%F{white}eval depth: %F{green}%e%f - %F{white}exec: %F{cyan}%x%f%  - %F{white}source: %F{blue}%N%f%  - %F{white}line no.: %F{magenta}%I%f - %F{white}code: %F{yellow} '
 clear
 echo ""
 echo "----------------------------------------------------------------------"
-echo " "$YELLOW"This is the output without tracing --> ' -x' is not set"$RESET""
+echo " ""$YELLOW""This is the output without tracing --> ' -x' is not set""$RESET"""
 echo ""
 echo "PS4 demo script"
 ls -l /etc/ | wc -l
@@ -28,15 +28,15 @@ du -sh ~
 echo ""
 echo "----------------------------------------------------------------------"
 echo ""
-echo -e "\n "$RESET"|------------------------------|\n | "$GREEN"Press any key to continue..."$RESET" |\n |------------------------------|"; read -k1 -s
+echo -e "\n ""$RESET""|------------------------------|\n | ""$GREEN""Press any key to continue...""$RESET"" |\n |------------------------------|"; read -r -k1 -s
 echo ""
 echo "----------------------------------------------------------------------"
 echo ""
-echo -e " "$YELLOW"This is the output with tracing --> ' -x' is set with 'set -x'\n"$RESET"" && set -x
+echo -e " ""$YELLOW""This is the output with tracing --> ' -x' is set with 'set -x'\n""$RESET""" && set -x
 echo "PS4 demo script"
 ls -l /etc/ | wc -l
 du -sh ~
 unset -x
-if [[ -n "$PS4_TEMP" ]]; then PS4="$PS4_TEMP" && export PS4; fi
+[[ -n "$PS4_TMP" ]] && PS4="$PS4_TMP" && export PS4
 echo -e "Your PS4 prompt var has been restored."
 echo -e "end of demo script\n"
