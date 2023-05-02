@@ -25,7 +25,6 @@ It should look like this (among other entries):
 ```
 [X11]
 ServerArguments=-nolisten tcp -dpi 96
-
 ```
 
 After restarting your computer the scaling problem should be gone and your desktop look like this:
