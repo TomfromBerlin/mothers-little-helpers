@@ -30,6 +30,7 @@ Some of the scripts may have their own license, if not, the [MIT license](https:
 - [Installing a compressed swapfile in RAM (zramswap)](helpers/scripts/zramswap/zramswap.md)
 - [Measure loading time of the shell](helpers/scripts/zlt/shlt.md)
 - [what_shell](helpers/scripts/misc/what_shell) - shows the (sub-)shell that is currently used. usage: `source what_shell` (the file should live somewhere in your $PATH)
+- [PS4-demo](helpers/scripts/misc/PS4_demo.sh) - This script demonstrates the functionality of the PS4 prompt variable
 
 ## Information tools for command line
 
