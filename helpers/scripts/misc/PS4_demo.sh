@@ -15,6 +15,8 @@ echo -e " It will show\n the "$GREEN"evaluation depth$RESET,\n the "$CYAN"name o
 echo -e " "$RED"We will overwrite any existing definition of PS4, and restore it afterwards.\n If you do not want that, press CTRL-C to exit, or"
 echo -e "\n "$RESET"|------------------------------|\n | "$GREEN"Press any key to continue..."$RESET" |\n |------------------------------|"; read -k1 -s
 echo ""
+if [[ -n "$PS4" ]]; then PS4_TMP="$PS4"; fi
+export PS4_TEMP
 export PS4='%F{white}eval depth: %F{green}%e%f - %F{white}exec: %F{cyan}%x%f%  - %F{white}source: %F{blue}%N%f%  - %F{white}line no.: %F{magenta}%I%f - %F{white}code: %F{yellow} '
 clear
 echo ""
@@ -35,4 +37,8 @@ echo -e " "$YELLOW"This is the output with tracing --> ' -x' is set with 'set -x
 echo "PS4 demo script"
 ls -l /etc/ | wc -l
 du -sh ~
-echo "end of demo script\n"
+unset -x
+if [[ -n "$PS4_TEMP" ]]; then PS4="$PS4_TEMP"; fi
+export PS4
+echo -e "Your PS4 prompt var has been restored."
+echo -e "end of demo script\n"
