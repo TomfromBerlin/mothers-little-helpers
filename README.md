@@ -16,7 +16,7 @@ Some of the scripts may have their own license, if not, the [MIT license](https:
 ## Tips & Tricks
 
 - [How to make Debian 11 (bullseye) & unbound work together](/../../../../TomfromBerlin/Debian-Pihole-Unbound)
-- [How to fix incorrect scaling of KDE Plasma when using a nvidia card with propietary dirvers](helpers/kde-nvidia/kde-nvidia.md)
+- [How to fix incorrect scaling of KDE Plasma when using a nvidia card with propietary dirvers](helpers/kde-nvidia)
 
 ## Functions
 
