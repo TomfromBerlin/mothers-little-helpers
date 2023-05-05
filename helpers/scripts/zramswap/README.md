@@ -92,3 +92,5 @@ free -h
 exit
 ```
 Thats all. You can download the script [here](zram-install.sh)
+
+See documentation of zram [here](https://github.com/torvalds/linux/blob/7163a2111f6c030ee39635ac3334bfa1a52a3dd3/Documentation/admin-guide/blockdev/zram.rst)
