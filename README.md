@@ -23,14 +23,15 @@ Some of the scripts may have their own license, if not, the [MIT license](https:
 - [allcolors](helpers/scripts/functions/allcolors) - shows the escape sequences for colors in the terminal
 - [chpwd](helpers/scripts/functions/chpwd) - auto-ls after each directory change (zsh only)
 - [title](helpers/scripts/funtions/title) - show command in window title bar (zsh only)
-- [zsh_wifi_signal](helpers/scripts/functions/zsh_wifi_signal) - shows wifi signal strength in a terminal
+- [zsh_wifi_signal](helpers/scripts/functions/zsh_wifi_signal) - shows wifi signal strength in a terminal (zsh only)
 
 ## Scripts
 
 - [Installing a compressed swapfile in RAM (zramswap)](helpers/scripts/zramswap/zramswap.md)
 - [Measure loading time of the shell](helpers/scripts/zlt/shlt.md)
-- [what_shell](helpers/scripts/misc/what_shell) - shows the (sub-)shell that is currently used. usage: `source what_shell` (the file should live somewhere in your $PATH)
+- [zrecompile](https://github.com/TomfromBerlin/mothers-little-helpers/blob/main/helpers/scripts/misc/zrecompile) - compiles functions and dot-files, if necessary (zsh only)
 - [PS4-demo](helpers/scripts/misc/PS4_demo.sh) - This script demonstrates the functionality of the PS4 prompt variable
+- [what_shell](helpers/scripts/misc/what_shell) - shows the (sub-)shell that is currently used. usage: `source what_shell` (the file should live somewhere in your $PATH)
 
 ## Information tools for command line
 
