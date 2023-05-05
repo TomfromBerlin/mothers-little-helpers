@@ -91,7 +91,7 @@ DEBIAN_FRONTEND=noninteractive
 #
 # show only questions that one really, really need to see
 DEBIAN_PRIORITY=critical
-
+export DEBIAN_PRIORITY
 # check if zram is already installed
 # if it is installed we only check the status and display mem stats,
 # since we do not want to change any existing configuration by accident
@@ -103,7 +103,15 @@ sudo apt-get -yq install zram-tools < /dev/null > /dev/null
 
 # configure the swapfile to 50% of available RAM, compressed with zstd algorythm
 # and write it to /etc/default/zramswap
-echo -e ALGO="zstd\nPERCENT=50" | sudo tee -a /etc/default/zramswap
+echo -e ALGO="zstd\nPERCENT=50\nPRIORITY=100" | sudo tee -a /etc/default/zramswap
+
+# Compression algorithm selection
+# speed: lz4 > zstd > lzo
+# compression: zstd > lzo > lz4
+# See /sys/block/zram0/comp_algorithm (when zram module is loaded) to see
+# what is currently set and available for your kernel
+# https://github.com/torvalds/linux/drivers/block/zram/Kconfig
+# https://github.com/torvalds/linux/Documentation/admin-guide/blockdev/zram.rst
 
 # now invoke the service with
 sudo service zramswap reload
@@ -125,6 +133,8 @@ read -pr "         at system boot time?" ans_yn
 echo -e "\e[0m"
 sudo systemctl enable zramswap.service && echo -en "\e[1;36mDone."
 # show memory & swap file stats
-echo -e "\e[1;32m" && free -h && echo -e "\e[0m" && exit
+echo -e "\e[1;32m"
+free -h
+echo -e "\e[0m"
 #
 # EOF
