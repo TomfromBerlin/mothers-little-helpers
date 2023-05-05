@@ -27,9 +27,9 @@ Some of the scripts may have their own license, if not, the [MIT license](https:
 
 ## Scripts
 
-- [Installing a compressed swapfile in RAM (zramswap)](helpers/scripts/zramswap/zramswap.md)
-- [Measure loading time of the shell](helpers/scripts/zlt/shlt.md)
-- [zrecompile](https://github.com/TomfromBerlin/mothers-little-helpers/blob/main/helpers/scripts/misc/zrecompile) - compiles functions and dot-files, if necessary (zsh only)
+- [Installing a compressed swapfile in RAM (zramswap)](helpers/scripts/zramswap)
+- [Measure loading time of the shell](helpers/scripts/shlt)
+- [zrecompile](helpers/scripts/misc/zrecompile) - compiles functions and dot-files, if necessary (zsh only)
 - [PS4-demo](helpers/scripts/misc/PS4_demo.sh) - This script demonstrates the functionality of the PS4 prompt variable
 - [what_shell](helpers/scripts/misc/what_shell) - shows the (sub-)shell that is currently used. usage: `source what_shell` (the file should live somewhere in your $PATH)
 
