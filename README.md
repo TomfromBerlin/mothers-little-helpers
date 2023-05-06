@@ -1,7 +1,7 @@
 | ![Views](https://img.shields.io/endpoint?color=green&label=Views&logoColor=red&style=plastic&url=https%3A%2F%2Fhits.dwyl.com%2FTomfromBerlin%2Fmothers-little-helpers) | ![Unique Viewers](https://img.shields.io/endpoint?color=green&label=Unique%20Viewers&logoColor=pink&style=plastic&url=https%3A%2F%2Fhits.dwyl.com%2FTomfromBerlin%2Fmothers-little-helpers%3Fshow%3Dunique) |
 |-|-|
 
-# Mothers Littel Helpers
+# Mothers Little Helpers
 
 **Do not clone this repository, it makes no sense. You should rather stare it, because it is just a collection of tips, tricks and scripts that you may need once or only once in a while.**
 
@@ -27,13 +27,13 @@ Some of the scripts may have their own license, if not, the [MIT license](https:
 
 ## Scripts
 
-- [Installing a compressed swapfile in RAM (zramswap)](helpers/scripts/zramswap)
-- [Measure loading time of the shell](helpers/scripts/shlt)
-- [zrecompile](helpers/scripts/misc/zrecompile) - compiles functions and dot-files, if necessary (zsh only)
-- [PS4-demo](helpers/scripts/misc/PS4_demo.sh) - This script demonstrates the functionality of the PS4 prompt variable
-- [what_shell](helpers/scripts/misc/what_shell) - shows the (sub-)shell that is currently used. usage: `source what_shell` (the file should live somewhere in your $PATH)
+- [zramswap](helpers/scripts/zramswap) - install a compressed swapfile in RAM
+- [shlt](helpers/scripts/shlt) - measure loading time of the shell
+- [zrecompile](helpers/scripts/misc/zrecompile) - compile functions and dot-files, if necessary (zsh only)
+- [PS4-demo](helpers/scripts/misc/PS4_demo.sh) - demonstrate the functionality of the PS4 prompt variable
+- [what_shell](helpers/scripts/misc/what_shell) - show the (sub-)shell that is currently used. usage: `source what_shell` (the file should live somewhere in your $PATH)
 
 ## Information tools for command line
 
-- [screenFetch - The Bash Screenshot Information Tool](https://github.com/KittyKatt/screenFetch)
-- [Neofetch - command-line system information tool](https://github.com/dylanaraps/neofetch)
+- [screenFetch](https://github.com/KittyKatt/screenFetch) - The Bash Screenshot Information Tool
+- [Neofetch](https://github.com/dylanaraps/neofetch) - command-line system information tool
