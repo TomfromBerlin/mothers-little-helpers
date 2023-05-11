@@ -16,7 +16,8 @@ echo -e " ""$RED""We will overwrite any existing definition of PS4, and restore 
 echo -e "\n ""$RESET""|------------------------------|\n | ""$GREEN""Press any key to continue...""$RESET"" |\n |------------------------------|"; read -r -k1 -s
 echo ""
 [[ -n "$PS4" ]] && PS4_TMP="$PS4" && export PS4_TMP
-export PS4='%F{white}eval depth: %F{green}%e%f - %F{white}exec: %F{cyan}%x%f%  - %F{white}source: %F{blue}%N%f%  - %F{white}line no.: %F{magenta}%I%f - %F{white}code: %F{yellow} '
+PS4='%F{white}eval depth: %F{green}%e%f - %F{white}exec: %F{cyan}%x%f%  - %F{white}source: %F{blue}%N%f%  - %F{white}line no.: %F{magenta}%I%f - %F{white}code: %F{yellow} '
+export PS4
 clear
 echo ""
 echo "----------------------------------------------------------------------"
@@ -36,7 +37,10 @@ echo -e " ""$YELLOW""This is the output with tracing --> ' -x' is set with 'set 
 echo "PS4 demo script"
 ls -l /etc/ | wc -l
 du -sh ~
-unset -x
-[[ -n "$PS4_TMP" ]] && PS4="$PS4_TMP" && export PS4
+[[ -n "$PS4_TMP" ]]
+PS4="$PS4_TMP"
+export PS4
+unsetopt -x
+echo "$RESET"
 echo -e "Your PS4 prompt var has been restored."
-echo -e "end of demo script\n"
+echo -e "End of demo script\n"
