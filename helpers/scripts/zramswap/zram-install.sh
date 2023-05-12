@@ -27,7 +27,7 @@
 ################################################################################
 #                                                                       #
 # Description:                                                          #
-# If you run a Raspberry Pi with an SD card as system drive,            #
+# If you run a Raspberry Pi with a SD card as the system drive,         #
 # you may want to consider to have the swapfile installed               #
 # in your RAM to reduce write access to the SD card.                    #
 #                                                                       #
@@ -36,7 +36,7 @@
 #            This script installs a compressed RAM drive that is        #
 #                         used as a swap drive.                         #
 #                                                                       #
-#        All commands are explained in the code when the occure.        #
+#        All commands are explained in the code when they occure.       #
 #                                                                       #
 #########################################################################
 #                                                                       #
@@ -73,7 +73,7 @@ echo -e "                      ......."
 echo -e " "
 echo -e " "
 echo -e "\e[1;36m"
-# We ask one last time whether the installation should begin.
+# We ask whether the installation should begin.
 echo -e "         Do you want to install zram-tools"
 read -pr"       and establish a swapfile in your RAM?" ans_yn
    case "$ans_yn" in
