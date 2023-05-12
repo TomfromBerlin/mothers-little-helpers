@@ -37,8 +37,7 @@ echo -e " ""$YELLOW""This is the output with tracing --> ' -x' is set with 'set 
 echo "PS4 demo script"
 ls -l /etc/ | wc -l
 du -sh ~
-[[ -n "$PS4_TMP" ]]
-PS4="$PS4_TMP"
+[[ -n "$PS4_TMP" ]] && PS4="$PS4_TMP"
 export PS4
 unsetopt -x
 echo "$RESET"
