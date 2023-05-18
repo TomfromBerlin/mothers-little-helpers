@@ -40,13 +40,40 @@ sudo apt-get -yq install zram-tools < /dev/null > /dev/null
 
 The switch [-yq] answers [y]es to apt-get and makes the output more or less [q]uiet.
 
-[< /dev/null > /dev/null] redirects the remaining output (stdin, stdout) to nowhere, only errors will be shown
+[< /dev/null > /dev/null] redirects the remaining output (stdin, stdout) to nowhere, only errors will be shown.
 
-We now configure the swapfile to 50% of available RAM, to be compressed with zstd algorythm, and write it to `/etc/default/zramswap`
+Now we get back to the default frontend for apt/apt-get.
 
 ```
-echo -e ALGO="zstd\nPERCENT=50" | sudo tee -a /etc/default/zramswap
+export DEBIAN_FRONTEND=dialog
 ```
+
+After the successful installation the user is asked for the compression algorithm and the percentage of memory to be used.
+
+Possible values for the algorithm are:
+- zstd (recommended)
+- lz4hc
+- lz4
+- lzo-rle
+- lzo
+- 842 (if you really hate your life)
+
+| Alogorithm comparission | best > > > > > > > > > > > > > > worst |
+|-|-|
+| speed:           | lz4 > lz4hc > zstd > lzo-rle > lzo > 842 |
+| de-/compression: | zstd > lzo-rle > lzo > lz4hc > lz4 > 842 |
+
+Type `cat /sys/block/zram0/comp_algorithm` at command line (when zram module is loaded) to see what is [currently set], and available for your kernel. The corresponding configuration will be saved using `sudo tee -a /etc/default/zramswap`. How this works in detail can be looked up in the source code.
+
+The resulting configuration could be look like the following:
+
+```
+ALGO=zstd               # algorithm to be used
+PERCENT=50              # a value between 30 and 50 seems to be a good choice in most cases
+PRIORITY=100            # the lower this value, the higher the priority
+```
+
+PRIORITY is hard coded because it is a background process and we do not want it to interfere with foreground tasks.
 
 Now the service will be invoked with
 
@@ -54,12 +81,9 @@ Now the service will be invoked with
 sudo service zramswap reload
 ```
 
-and we do not forget to close the "if-then" statement with `fi`
-
-Now we get back to the default frontend for apt/apt-get.
-
+and we do not forget to close the "if-then" statement with
 ```
-export DEBIAN_FRONTEND=dialog
+fi
 ```
 
 Lets show the status of the service; it should be active and running
