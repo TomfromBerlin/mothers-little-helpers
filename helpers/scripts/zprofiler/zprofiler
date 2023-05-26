@@ -1,0 +1,97 @@
+#!/bin/env zsh
+################################################################################
+#                                                                              #
+# Copyright 2023 Thomas Bernard (https://github.com/TomfromBerlin)             #
+#                                                                              #
+# Permission is hereby granted, free of charge, to any person obtaining a copy #
+# of this software and associated documentation files (the “Software”), to     #
+# deal in the Software without restriction, including without limitation the   #
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or  #
+# sell copies of the Software, and to permit persons to whom the Software is   #
+# furnished to do so, subject to the following conditions:                     #
+#                                                                              #
+# The above copyright notice and this permission notice shall be included in   #
+# all copies or substantial portions of the Software.                          #
+#                                                                              #
+# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR   #
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,     #
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE  #
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER       #
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING      #
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS #
+# IN THE SOFTWARE.                                                             #
+#                                                                              #
+################################################################################
+#                                                                              #
+# Description:                                                                 #
+# This script is designed to run the profiling function of the Z shell.        #
+# Z-Shell profiling helps determine the workload of each command that          #
+# is invoked when a Z-Shell instance is started.                               #
+#                                                                              #
+# The script first checks if the ".zshrc" file even exists and if the          #
+# necessary instructions are contained in the file.                            #
+# If the file is missing, the script does nothing but print a message.         #
+# If the necessary instructions are not found or commented out, the user is    #
+# informed and given instructions on how to deal with the problem.             #
+#                                                                              #
+# Usage:                                                                       #
+# Copy this file into a folder that is part of $fpath.                         #
+# Restart your Z shell (e.g., open a new terminal window) and call the function#
+# by simply typing "zprofiler" into the command line.                          #
+# This is much easier to remember and faster to type than                      #
+# "ZPROF=1 zsh -i -c exit".                                                    #
+#                                                                              #
+################################################################################
+
+if [ ! -f "$HOME/.zshrc" ]; then
+    echo -e "\n$HOME/.zshrc is missing.\nDo you have Z shell installed?\n"
+    exit 1
+fi
+
+zprofiler() {
+    local GREEN='\033[1;32m'
+    local RED='\033[1;31m'
+    local YELLOW='\033[1;33m'
+    local CYAN='\e[1;36;40m'
+    local BLUE='\e[0;34;40m'
+    local MAGENTA='\e[1;35;40m'
+    local RESET='\033[0m'
+
+    local _file="$HOME/.zshrc"
+    local _search1="[ -z \"\$ZPROF\" ] || zmodload zsh/zprof"
+    local _search2="[ -z \"\$ZPROF\" ] || zprof"
+
+    local _result1=$(grep -n -e "$_search1" "$_file")
+    local _result2=$(grep -n -e "$_search2" "$_file")
+
+    if [ -z "$_result1" ] || [ -z "$_result2" ]; then
+        if [ -z "$_result1" ] && [ -z "$_result2" ]; then
+            echo -e "$RED If you want to profile your Z shell you need to add\n\n   $YELLOW$_search1$RED\n\n at the beginning of $CYAN$_file$RED and\n\n   $YELLOW$_search2$RED\n\n at the end of $CYAN$_file$RESET.\n" && return
+        fi
+        if [ -z "$_result1" ]; then
+            echo -e "$RED You need to add $MAGENTA$_search1$RED at the beginning of $CYAN$_file$RESET."
+        elif [ -z "$_result2" ]; then
+            echo -e "$RED You need to add $MAGENTA$_search2$RED at the end of $CYAN$_file$RESET."
+        fi
+    fi
+
+    if grep -q -e "$_search1" -e "$_search2" "$_file"; then
+        if grep -q -e "^#.*$_search1" "$_file"; then
+            echo -e "$RED The line with $MAGENTA$_search1\n$RED in the file $CYAN$_file$RED is commented out.$RESET"
+            _result3=$(grep -n -e "^#.*$_search1" "$_file" | awk -F ":" '{ print $1 }') && echo -e "$RED You need to remove the leading $YELLOW#$RED from line $YELLOW$_result3$RED in $CYAN$_file$RESET."
+        fi
+
+        if grep -q -e "^#.*$_search2" "$_file"; then
+            echo -e "$RED The line with $MAGENTA$_search2\n$RED in the file $CYAN$_file$RED is commented out.$RESET"
+            _result4=$(grep -n -e "^#.*$_search2" "$_file" | awk -F ":" '{ print $1 }') && echo -e "$RED You need to remove the leading $YELLOW#$RED from line $YELLOW$_result4$RED in $CYAN$_file$RESET"
+        fi
+
+        if [[ -z "$_result1" || -z "$_result2" || -n "$_result3" || -n "$_result4" ]]; then
+            echo -e "$RED\n If you want to profile your zsh, you need to make the necessary changes as mentioned above.$RESET\n" && return
+        else
+            ZPROF=1 zsh -i -c exit
+        fi
+    fi
+}
+
+zprofiler
