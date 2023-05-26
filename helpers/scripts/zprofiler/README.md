@@ -17,6 +17,8 @@
   Copy this file into a folder that is part of $fpath and restart your Z shell (e.g., open a new terminal window). Then call the function by simply typing "zprofiler" into the command line. This is much easier to remember and faster to type than `ZPROF=1 zsh -i -c exit`.
   </summary>
 
+  ## Description
+  
   The first part of the code checks if the file ~/.zshrc exists. If it does not exist, it prints a message indicating that the file is missing and asks if Z shell is installed. Then it exits with a status code of 1.
   
   The second part is the actual function.
