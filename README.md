@@ -23,6 +23,7 @@ Some of the scripts may have their own license, if not, the [MIT license](https:
 - [allcolors](helpers/scripts/functions/allcolors) - shows the escape sequences for colors in the terminal
 - [chpwd](helpers/scripts/functions/chpwd) - auto-ls after each directory change (zsh only)
 - [title](helpers/scripts/funtions/title) - show command in window title bar (zsh only)
+- [zprofiler](helpers/scripts/zprofiler) - profiling of the Z shell with instructions for configuration, if necessary
 - ~[zsh_wifi_signal](helpers/scripts/functions/zsh_wifi_signal) - shows wifi signal strength in a terminal (zsh only)~
 
 ## Scripts
