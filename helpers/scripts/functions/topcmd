@@ -1,0 +1,139 @@
+#!bin/bash
+# shamelessly stolen from https://github.com/abhinav-nath/all-about-shell/blob/master/dev-setup/.functions
+# and then modified by Thomas Bernard (https://github.com/TomfromBerlin) (c)2023
+# Licence: MIT Licence
+# Everything below this line comes without any warranty of any kind. Use at your own risk.
+topcmd_invalid() {
+cat <<EOH
+
+  Usage: topcmd
+         topcmd -v
+         topcmd -vx
+         topcmd --help    # same as topcmd -h
+         topcmd -c
+
+EOH
+}
+topcmd_help() {
+cat <<EOH
+
+  Usage: topcmd -v / -vx / -h / --help / -c
+
+  Descrption:
+  "topcmd" will show the most frequently used commands in the current session.
+  "topcmd -v" gives a more detailed output including the respective command arguments in the current session.
+  "topcmd -vx" outputs the most frequently used commands of the entire command history stored in the history file ($HISTFILE)
+  "topcmd -c" shows an example configuration of the history function, that belongs in $HOME/.zshrc
+
+  The output depends heavily on how the history function is configured in $HOME/.zshrc.
+  For example, if "HIST_IGNORE_ALL_DUPS" is set, no duplicates are stored and consequently not counted.
+  That is, "topcmd -v" in conjunction with "HIST_IGNORE_ALL_DUPS" shows only a "1" in the "COUNT" column for each command entry, but more commands are included - for whatever reason.
+
+  Example:
+
+  % topcmd -v  # "HIST_IGNORE_ALL_DUPS" is set
+  Rank  Count   Percent  Command  Arguments
+     1      1  9.09091%  topcmd   -x
+     2      1  9.09091%  topcmd   -vx
+     3      1  9.09091%  topcmd   -h
+     4      1  9.09091%  topcmd
+     5      1  9.09091%  sleep    5
+     6      1  9.09091%  sleep    2
+     7      1  9.09091%  sleep    1
+     8      1  9.09091%  shlt
+     9      1  9.09091%  man      awk
+    10      1  9.09091%  cls
+    11      1  9.09091%  cat     .zshrc
+
+  % topcmd -v  # "HIST_IGNORE_ALL_DUPS" is not set
+  Rank  Count  Percent  Command  Arguments
+     1      6    37.5%  topcmd   -h
+     2      4      25%  topcmd
+     3      3   18.75%  topcmd   -v
+     4      2    12.5%  topcmd   -vx
+     5      1    6.25%  cat     .zshrc
+
+  % topcmd -vx  # "HIST_IGNORE_ALL_DUPS" is not set
+  Rank  Count   Percent  Command  Arguments
+     1     16  21.6216%  topcmd   -v
+     2     13  17.5676%  topcmd   -h
+     3     12  16.2162%  topcmd   -vx
+     4     11  14.8649%  topcmd
+     5      7  9.45946%  sleep    1
+     6      6  8.10811%  cls
+     7      4  5.40541%  topcmd   -x
+     8      1  1.35135%  sleep    5
+     9      1  1.35135%  sleep    2
+    10      1  1.35135%  shlt
+    11      1  1.35135%  man      awk
+    12      1  1.35135%  cat     .zshrc
+
+  % topcmd  # "HIST_IGNORE_ALL_DUPS" is not set
+  Rank  Count  Percent  Command
+     1     15   93.75%  topcmd
+     2      1    6.25%  cat
+
+  As you can see some of the commands were called with arguments.
+  "topcmd -v" as well as "topcmd -vx" will treat them as different commands while "topcmd" (without arguments) will treat them as the same command.
+  You will probably have more fun with this function if "HIST_IGNORE_ALL_DUPS" is not set in $HOME/.zshrc.
+
+EOH
+}
+history_conf() {
+cat <<EOH
+
+  Example configuration that works well with "topcmd [-<arg>]".
+  If desired, you can add the following lines to the $HOME/.zshrc file.
+  #-8<-snip-
+
+    setopt EXTENDED_HISTORY
+    setopt HIST_APPEND
+    setopt HIST_EXPAND
+    setopt HIST_SAVE_NO_DUPS
+    setopt HIST_EXPIRE_DUPS_FIRST
+    # setopt HIST_IGNORE_ALL_DUPS
+    setopt HIST_FIND_NO_DUPS
+    setopt HIST_IGNORE_SPACE
+    setopt HIST_NO_STORE # tells the shell not to store history for fc commands
+    setopt HIST_NO_FUNCTIONS # tells the shell not to store function definitions
+    setopt SHARE_HISTORY
+    setopt INC_APPEND_HISTORY
+    setopt HASH_LIST_ALL
+
+  #-snip->8-
+
+EOH
+}
+topcmd() {
+  if [ -z "$1" ]; then
+    printf '\n\e[0;32m%s\e[0m\n\n' "The most frequently used commands are..."
+    history | awk '$1="";{CMD[$2]++;count++;}END { for (a in CMD) print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | sort -S1% -nr -f | nl -n rn |  head -n20 | column -t -N Rank,Count,Percent,Command -R Rank,Count,Percent
+    printf '\n\e[0;32m%s\e[1;35m%s\e[0;32m%s\e[1;35m%s\e[0;32m%s\e[0m\n\n' "Type " "topcmd -h" " or " "topcmd --help" " for more info."
+  else
+    case "$1" in
+      "-v")
+        printf '\n\e[0;32m%s\e[0m\n\n' "The most frequently used commands (divided according to given arguments) are..."
+        history | awk '$1="";{CMD[$0]++;count++}END {for (a in CMD) print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | sort -S1% -nr -f | nl -n rn | head -n20 | column -t -N Rank,Count,Percent,Command,Arguments -R Rank,Count,Percent && printf '\n'
+        ;;
+      "-vx")
+        if ! [ -r "$HISTFILE" ];  then printf '\n\e[1;31m%s\e[0;35m%s\e[1;31m%s\e[0m\n\n' "The -vx option depends on the existence of the history file. You must define" " HISTFILE=<your_desired_filename>" " in .zshrc!"; else
+        printf '\n\e[0;32m%s\e[0m\n\n' "The most frequently used commands of the entire command history are..."
+        fc -l 1 | awk '$1="";{CMD[$0]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | sort -S1% -nr -f | nl -n rn | head -n30 | column -t -N Rank,Count,Percent,Command,Arguments -R Rank,Count,Percent && printf '\n'
+        fi
+        ;;
+      "-c")
+        history_conf
+        ;;
+      "-h"|"--help")
+        topcmd_help
+        ;;
+      *)
+        printf '\n\e[0;31m%s\e[0m\n' "  Invalid argument."
+        topcmd_invalid
+        printf '\e[0;31m%s\e[1;32m%s\e[0;31m%s\e[0m\n\n' "  Type" " topcmd -h " "for more info."
+        ;;
+    esac
+  fi
+}
+
+topcmd "$@"
