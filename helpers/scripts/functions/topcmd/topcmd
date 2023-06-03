@@ -85,6 +85,10 @@ cat <<EOH
   If desired, you can add the following lines to the $HOME/.zshrc file.
   #-8<-snip-
 
+    HISTFILE=~/.zsh_history
+    HISTSIZE=10000
+    SAVEHIST=10000
+    HISTTIMEFORMAT="[%F %T] " # change this to your desired format (see 'man strftime')
     setopt EXTENDED_HISTORY
     setopt HIST_APPEND
     setopt HIST_EXPAND
