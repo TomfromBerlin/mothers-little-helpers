@@ -5,6 +5,6 @@
 #
 # usefull for auto-ls after each directory change
 #
-function chpwd(){
+chpwd(){
 emulate -L zsh; ls -FA --color=always --group-directories-first;
 }
