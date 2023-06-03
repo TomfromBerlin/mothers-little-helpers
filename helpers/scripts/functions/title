@@ -23,7 +23,7 @@
 ################################################################################
 #
 #---show the running command in windows title bar------------------------------
-function title() {
+title() {
 active_shell="$(ps -cp "$$" -o command="")"
     if [ $active_shell = zsh ]; then
     emulate -L zsh
