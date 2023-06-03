@@ -111,12 +111,12 @@ topcmd() {
   else
     case "$1" in
       "-v")
-        printf '\n\e[0;32m%s\e[0m\n\n' "The most frequently used commands (divided according to given arguments) are..."
+        printf '\n\e[0;32m%s\e[0;36m\n%s\e[0m\n\n' "The most frequently used commands (divided according to given arguments) are..." "(Very long commands can cause line breaks, making the output difficult to read)"
         history | awk '$1="";{CMD[$0]++;count++}END {for (a in CMD) print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | sort -S1% -nr -f | nl -n rn | head -n20 | column -t -N Rank,Count,Percent,Command,Arguments -R Rank,Count,Percent && printf '\n'
         ;;
       "-vx")
         if ! [ -r "$HISTFILE" ];  then printf '\n\e[1;31m%s\e[0;35m%s\e[1;31m%s\e[0m\n\n' "The -vx option depends on the existence of the history file. You must define" " HISTFILE=<your_desired_filename>" " in .zshrc!"; else
-        printf '\n\e[0;32m%s\e[0m\n\n' "The most frequently used commands of the entire command history are..."
+        printf '\n\e[0;32m%s\e[0;36m\n%s\e[0m\n\n' "The most frequently used commands in the entire command history (divided according to given arguments) are..." "(Very long commands can cause line breaks, making the output difficult to read)"
         fc -l 1 | awk '$1="";{CMD[$0]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | sort -S1% -nr -f | nl -n rn | head -n30 | column -t -N Rank,Count,Percent,Command,Arguments -R Rank,Count,Percent && printf '\n'
         fi
         ;;
