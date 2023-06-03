@@ -1,7 +1,7 @@
 # topcmd
 
 <details>
-  <summary> The topcmd function provides a convenient way to analyze and display frequently used commands in a shell session or command history. </summary>
+  <summary> The topcmd function provides a convenient way to analyze and display frequently used commands of the current shell session or the entire command history. </summary>
 
 ## Description
 
