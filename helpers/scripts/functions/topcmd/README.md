@@ -1,11 +1,11 @@
 # topcmd
 
 <details>
-  <summary> The topcmd function provides a convenient way to analyze and display frequently used commands of the current shell session or the entire command history. </summary>
+  <summary> This script provides a utility for analyzing and displaying the most frequently used commands from the shell's command history. It offers various options to customize the output and provides helpful information for configuring the history function in zsh. </summary>
 
 ## Description
 
-The function starts with a conditional statement that checks if the first argument ($1) is empty. If it is, it means no argument was provided, and the function proceeds to display the most frequently used commands in the current session.
+The function checks if the first argument ($1) is empty. If it is, it means no argument was provided, and the function proceeds to display the most frequently used commands in the current session.
 
 If an argument is provided, the function uses a case statement to handle different argument options. The following options are supported:
 
@@ -17,12 +17,8 @@ If an argument is provided, the function uses a case statement to handle differe
 
  `-h` or `--help` - Displays detailed usage instructions and examples.
 
-Within the topcmd function, there are several nested functions (topcmd_invalid, topcmd_help, and history_conf) that are used to display help information and example configurations.
-
-The main logic of the topcmd function involves using the history command and awk to process and count the commands. The output is then formatted and displayed using various shell commands (grep, sort, nl, head, column) to achieve a tabular representation of the data.
-
-Depending on the argument option, the function either uses the history command to analyze the current session or uses the fc command to analyze the entire command history stored in a file specified by the $HISTFILE environment variable.
-
 The function uses ANSI escape sequences to format and colorize the output, providing visual cues and highlighting important information.
+
+It is worth noting that the code is somewhat bloated. That seems to be the toll you have to pay if you want to make all souls happy. In other words: Under Linux, the "column" command knows headers, whereas under MacOS and FreeBSD it does not. The result is that under Linux you have nice headers in the tables. Under MacOS and FreeBSD you have to do without.
   
 </details>
