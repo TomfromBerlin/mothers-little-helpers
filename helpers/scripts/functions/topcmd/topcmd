@@ -1,7 +1,49 @@
-# shamelessly stolen from https://github.com/abhinav-nath/all-about-shell/blob/master/dev-setup/.functions
-# and then modified by Thomas Bernard (https://github.com/TomfromBerlin) (c)2023
-# Licence: MIT Licence
-# Everything below this line comes without any warranty of any kind. Use at your own risk.
+
+################################################################################
+#                                                                              #
+# Copyright 2023 Thomas Bernard (https://github.com/TomfromBerlin)             #
+#                                                                              #
+# Permission is hereby granted, free of charge, to any person obtaining a copy #
+# of this software and associated documentation files (the “Software”), to     #
+# deal in the Software without restriction, including without limitation the   #
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or  #
+# sell copies of the Software, and to permit persons to whom the Software is   #
+# furnished to do so, subject to the following conditions:                     #
+#                                                                              #
+# The above copyright notice and this permission notice shall be included in   #
+# all copies or substantial portions of the Software.                          #
+#                                                                              #
+# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR   #
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,     #
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE  #
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER       #
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING      #
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS #
+# IN THE SOFTWARE.                                                             #
+#                                                                              #
+################################################################################
+#                                                                              #
+#                  usage: topcmd [-v][-vx][-c][-h]                             #
+#                                                                              #
+################################################################################
+#
+# We write the info lines to be echoed in variables so that we only have to write it once
+# and use the variables within the function. It also makes the code a lot cleaner.
+_msg="\n\e[0;32m The following commands were used most frequently...\e[0;0m\n\n"
+_msg_vx="\n\e[0;32m The following commands have been used most frequently (divided according to the arguments given)...\e[0m\n\n"
+_msg_long="\e[0;33m Very long commands can cause line breaks, making the output difficult to read.\e[0m\n\n"
+# determine the operating system
+topcmd_os() {
+[[ -x "/usr/bin/uname" ]] && OS=$(uname)
+export OS
+}
+# The _pager function can be used to distinguish between and configure different terminal pagers
+_pager() {
+if [[ -x /bin/most ]]; then most +us -w
+else
+less -n$LINES --use-color -dNe -DNb -M
+fi
+}
 topcmd_invalid() {
 cat <<EOH
 
@@ -14,129 +56,261 @@ cat <<EOH
 EOH
 }
 topcmd_help() {
-cat <<EOH
+_pager <<EOH
 
-  Usage: topcmd -v / -vx / -h / --help / -c
+   Usage: topcmd -v / -vx / -h / --help / -c
 
-  Descrption:
-  "topcmd" will show the most frequently used commands in the current session.
-  "topcmd -v" gives a more detailed output including the respective command arguments in the current session.
-  "topcmd -vx" outputs the most frequently used commands of the entire command history stored in the history file ($HISTFILE)
-  "topcmd -c" shows an example configuration of the history function, that belongs in $HOME/.zshrc
 
-  The output depends heavily on how the history function is configured in $HOME/.zshrc.
-  For example, if "HIST_IGNORE_ALL_DUPS" is set, no duplicates are stored and consequently not counted.
-  That is, "topcmd -v" in conjunction with "HIST_IGNORE_ALL_DUPS" shows only a "1" in the "COUNT" column for each command entry, but more commands are included - for whatever reason.
+   Descrption:
 
-  Example:
+   "topcmd"     - will show the most frequently used commands
 
-  % topcmd -v  # "HIST_IGNORE_ALL_DUPS" is set
-  Rank  Count   Percent  Command  Arguments
-     1      1  9.09091%  topcmd   -x
-     2      1  9.09091%  topcmd   -vx
-     3      1  9.09091%  topcmd   -h
-     4      1  9.09091%  topcmd
-     5      1  9.09091%  sleep    5
-     6      1  9.09091%  sleep    2
-     7      1  9.09091%  sleep    1
-     8      1  9.09091%  shlt
-     9      1  9.09091%  man      awk
-    10      1  9.09091%  cls
-    11      1  9.09091%  cat     .zshrc
+   "topcmd -v"  - gives a more detailed output including the respective
+                  command arguments according to the internal history
 
-  % topcmd -v  # "HIST_IGNORE_ALL_DUPS" is not set
-  Rank  Count  Percent  Command  Arguments
-     1      6    37.5%  topcmd   -h
-     2      4      25%  topcmd
-     3      3   18.75%  topcmd   -v
-     4      2    12.5%  topcmd   -vx
-     5      1    6.25%  cat     .zshrc
+   "topcmd -vx" - outputs a longer list of the most frequently used commands
 
-  % topcmd -vx  # "HIST_IGNORE_ALL_DUPS" is not set
-  Rank  Count   Percent  Command  Arguments
-     1     16  21.6216%  topcmd   -v
-     2     13  17.5676%  topcmd   -h
-     3     12  16.2162%  topcmd   -vx
-     4     11  14.8649%  topcmd
-     5      7  9.45946%  sleep    1
-     6      6  8.10811%  cls
-     7      4  5.40541%  topcmd   -x
-     8      1  1.35135%  sleep    5
-     9      1  1.35135%  sleep    2
-    10      1  1.35135%  shlt
-    11      1  1.35135%  man      awk
-    12      1  1.35135%  cat     .zshrc
+   "topcmd -c"  - shows an example configuration for the history function,
+                  which, if desired, can be written to a file sourced by
+                  $HOME/.zshrc or directly to $HOME/.zshrc
 
-  % topcmd  # "HIST_IGNORE_ALL_DUPS" is not set
-  Rank  Count  Percent  Command
-     1     15   93.75%  topcmd
-     2      1    6.25%  cat
+   "topcmd -h"  - show this text (same as "topcmd --help")
 
-  As you can see some of the commands were called with arguments.
-  "topcmd -v" as well as "topcmd -vx" will treat them as different commands while "topcmd" (without arguments) will treat them as the same command.
-  You will probably have more fun with this function if "HIST_IGNORE_ALL_DUPS" is not set in $HOME/.zshrc.
+
+   The output depends strongly on how the history function is configured.
+   (see "topcmd -c"). With "topcmd" you might see only two or three entries
+   in the list, but maybe up to ten. If you spam the same command 16 times
+   in a row, the list will have only one entry.
+   "topcmd -v" always has ten entries and "topcmd -vx" has thirty.
+
+   Please note that there are two types of command history in the Z shell.
+   There is the so-called "internal history" and $HISTFILE.
+
+   "topcmd" refers to the internal history, while "topcmd -v" & "topcmd -vx"
+   evaluate the entries in $HISTFILE.
+
+   Some configurations may contain aliases for the command "history" or other
+   things that affect the output, e.g. MacOS and some Linux distributions
+   come with a system configuration file (/etc/zshrc) that sets up a few
+   things including a per-terminal history. These settings are overridden
+   by settings made in or in files sourced by $HOME/.zshrc.
+   The last entry wins.
+
+   If one of the options
+
+             setopt append_history             # (set by default)
+             setopt inc_append_history or
+             setopt share_history
+
+   is set, or if the history is explicitly saved with "fc -AI", zsh adds to
+   the existing file. Note that even under these settings, zsh will
+   occasionally overwrites the file to truncate it to the value of \$SAVEHIST
+   (in your case to $SAVEHIST lines).
+
+   Otherwise, if the option
+
+             setopt hist_save_by_copy         # default since zsh 5.0,
+                                              # but does not exist in 4.2
+
+   is set, zsh writes a temporary file then moves it in place when complete.
+   In this case, if the history file was a symbolic link, the new file replaces
+   the symbolic link. Otherwise zsh overwrites the existing file in place.
+
+   "topcmd -vx" will treat commands according to given arguments as different
+   commands while "topcmd" as well as "topcmd -v" will treat them as the same
+   command.
+
+   Just play around with the configuration in $HOME/.zshrc, e.g., you will
+   probably have more fun with this function if "HIST_IGNORE_ALL_DUPS" is not set.
+
+   Type "topcmd -c" to get a configuration example (with explanations) that
+   works well with "topcmd [-v][-vx]".
+
+   Below are output examples under current Linux, under MacOS and FreeBSD there
+   are no headers, because their command "column" does not know the option "-N"
+
+   ----------------------------------------------------------------------------
+
+   [ZSH]: ~/
+   % topcmd
+
+   The following commands were used most frequently...
+
+   Rank  Count  Percent  Command
+      1     16     100%  topcmd
+
+   ----------------------------------------------------------------------------
+
+   [ZSH]: ~/
+   % topcmd -v
+
+   The following commands were used most frequently...
+
+   Rank  Count  Percent  Command
+      1     72  12.9964%  topcmd
+      2     59  10.6498%  echo
+      3     39  7.03971%  gh
+      4     30  5.41516%  zsh
+      5     25  4.51264%  sudo
+      6     25  4.51264%  git
+      7     21  3.79061%  zplg
+      8     21  3.79061%  nmcli
+      9     17  3.06859%  man
+     10     16  2.88809%  cd
+
+
+-------------------------------------------------------------------------------
+
+   [ZSH]: ~/
+   % topcmd -vx
+
+   The following commands have been used most frequently (divided according to the arguments given)...
+   (Very long commands can cause line breaks, making the output difficult to read)
+
+   Rank  Count    Percent  Command          Arguments
+      1     32    5.7554%  topcmd           -vx
+      2     20   3.59712%  topcmd
+      3     12   2.15827%  topcmd           -v
+      4      4  0.719424%  topcmd           -h
+      5      2  0.359712%  topcmd           -c
+      6      2  0.359712%  man              cat
+      7      2  0.359712%  echo             \$COLUMNS
+      8      2  0.359712%  bash             temperature-conversion
+      9      1  0.179856%  zsh              zsh_wifi_signal.sh
+     10      1  0.179856%  zsh              zsh-bench
+     11      1  0.179856%  zsh              zram-install.sh
+     12      1  0.179856%  zsh_wifi_signal
+     13      1  0.179856%  zsh              topcmd.zsh               -vx
+     14      1  0.179856%  zsh              topcmd.zsh               -v
+     15      1  0.179856%  zsh              topcmd.zsh
+     16      1  0.179856%  zsh              topcmd.sh                -d
+     17      1  0.179856%  zsh              topcmd.sh
+     18      1  0.179856%  zsh              topcmd
+     19      1  0.179856%  zsh              test.zsh                 -v
+     20      1  0.179856%  zsh              test.zsh                 -h
+     21      1  0.179856%  zsh              test.zsh                 10
+     22      1  0.179856%  zsh              test.zsh
+     23      1  0.179856%  zsh              temperature-conversion   f
+     24      1  0.179856%  zsh              temperature-conversion   cf
+     25      1  0.179856%  zsh              temperature-conversion   0
+     26      1  0.179856%  zsh              temperature-conversion
+     27      1  0.179856%  zsh              replace_txt.sh           video.txt
+     28      1  0.179856%  zsh              PS4_demo.sh
+     29      1  0.179856%  zsh              nerdfetch.sh
+     30      1  0.179856%  zsh              login-or-interactive.sh
+
 
 EOH
 }
 history_conf() {
 cat <<EOH
 
-  Example configuration that works well with "topcmd [-<arg>]".
-  If desired, you can add the following lines to the $HOME/.zshrc file.
-  #-8<-snip-
+  Example configuration that works well with "topcmd [-<arg>]" (at least on Linux boxes).
+  If desired, you can add the following lines to $HOME/.zshrc
 
-    HISTFILE=~/.zsh_history
-    HISTSIZE=10000
-    SAVEHIST=10000
-    HISTTIMEFORMAT="[%F %T] " # change this to your desired format (see 'man strftime')
-    setopt EXTENDED_HISTORY
-    setopt HIST_APPEND
-    setopt HIST_EXPAND
-    setopt HIST_SAVE_NO_DUPS
-    setopt HIST_EXPIRE_DUPS_FIRST
-    # setopt HIST_IGNORE_ALL_DUPS
-    setopt HIST_FIND_NO_DUPS
-    setopt HIST_IGNORE_SPACE
-    setopt HIST_NO_STORE # tells the shell not to store history for fc commands
-    setopt HIST_NO_FUNCTIONS # tells the shell not to store function definitions
-    setopt SHARE_HISTORY
-    setopt INC_APPEND_HISTORY
-    setopt HASH_LIST_ALL
+    HISTFILE=\$ZDOTDIR/.<file_name>  # without this the option "-vx" is more or less useless,
+                                     # replace <file_name> with your desired file name
 
-  #-snip->8-
+    HISTSIZE=15000                   # the maximum number of events stored in the internal history list
+
+    SAVEHIST=10000                   # the maximum number of history events to save in the history file
+                                     # ($HISTFILE)
+
+    setopt EXTENDED_HISTORY          # save each command's beginning timestamp (in seconds since the epoch)
+                                     # and the duration (in seconds) to \$HISTFILE
+
+    setopt HIST_APPEND               # attach the history of a new session to \$HISTFILE instead of replacing the history
+
+    setopt HIST_EXPAND               # perform textual history expansion, csh-style, treating the character '!' specially.
+
+    setopt HIST_SAVE_NO_DUPS         # when writing out the history file, older commands that duplicate newer ones are omitted
+
+    setopt HIST_EXPIRE_DUPS_FIRST    # If the internal history needs to be trimmed to add the current command line, this option
+                                     # will cause the oldest history event that has a duplicate to be lost before losing a
+                                     # unique event from the list
+
+    # setopt HIST_IGNORE_ALL_DUPS    # If a new command line being added to the history list duplicates an older one,
+                                     # the older command is removed from the list (even if it is not the previous event).
+
+    setopt HIST_FIND_NO_DUPS         # When searching for history entries in the line editor, do not display duplicates of
+                                     # a line previously found, even if the duplicates are not contiguous
+
+    setopt HIST_IGNORE_SPACE         # remove command lines from the history list when the first character on the line is a space
+
+    setopt HIST_NO_STORE             # tells the shell not to store history for fc commands in \$HISTFILE
+
+    setopt HIST_NO_FUNCTIONS         # tells the shell not to store function definitions
+
+    setopt SHARE_HISTORY             # imports new commands from the history file, and also causes your typed commands to
+                                     # be appended to the history file ($HISTFILE)
+
+    setopt INC_APPEND_HISTORY        # new history lines are added to the \$HISTFILE incrementally (as soon as they are entered)
+
+
+  More under https://zsh.sourceforge.io/Doc/Release/Options.html#History
 
 EOH
 }
 topcmd() {
-  if [ -z "$1" ]; then
-    printf '\n\e[0;32m%s\e[0m\n\n' "The most frequently used commands are..."
-    history | awk '$1="";{CMD[$2]++;count++;}END { for (a in CMD) print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | sort -S1% -nr -f | nl -n rn |  head -n20 | column -t -N Rank,Count,Percent,Command -R Rank,Count,Percent
-    printf '\n\e[0;32m%s\e[1;35m%s\e[0;32m%s\e[1;35m%s\e[0;32m%s\e[0m\n\n' "Type " "topcmd -h" " or " "topcmd --help" " for more info."
-  else
-    case "$1" in
-      "-v")
-        printf '\n\e[0;32m%s\e[0;36m\n%s\e[0m\n\n' "The most frequently used commands (divided according to given arguments) are..." "(Very long commands can cause line breaks, making the output difficult to read)"
-        history | awk '$1="";{CMD[$0]++;count++}END {for (a in CMD) print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | sort -S1% -nr -f | nl -n rn | head -n20 | column -t -N Rank,Count,Percent,Command,Arguments -R Rank,Count,Percent && printf '\n'
+local history=
+topcmd_os
+if [[ -n $OS ]]; then
+case "$OS" in
+   Linux) if [[ $1 = "" ]]; then
+             echo -en "$_msg"
+             fc -ln | awk '{CMD[$1]++;count++;}END { for (a in CMD) print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | sort -S1% -nr -f | nl |  head | column -t -N Rank,Count,Percent,Command -R Rank,Count,Percent
+             printf '\n'
+          elif [[ $1 = "-v" ]]
+             then echo -en "$_msg"
+             fc -ln 0 | awk '{CMD[$1]++;count++}END {for (a in CMD) print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | sort -S1% -nr -f | nl | head | column -t -N Rank,Count,Percent,Command -R Rank,Count,Percent && printf '\n'
+          elif [[ $1 = "-vx" ]]
+             then echo -en "$_msg_vx"
+             fc -ln 1 | awk '{CMD[$0]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | sort -S1% -nr -f | nl | head -n30 | column -t -N Rank,Count,Percent,Command,Arguments -R Rank,Count,Percent --table-truncate Arguments && printf '\n'
+          elif [[ $1 = "-h" ]]
+             then topcmd_help
+          elif [[ $1 = "-c" ]]
+             then history_conf
+          else
+             topcmd_invalid
+          fi
         ;;
-      "-vx")
-        if ! [ -r "$HISTFILE" ];  then printf '\n\e[1;31m%s\e[0;35m%s\e[1;31m%s\e[0m\n\n' "The -vx option depends on the existence of the history file. You must define" " HISTFILE=<your_desired_filename>" " in .zshrc!"; else
-        printf '\n\e[0;32m%s\e[0;36m\n%s\e[0m\n\n' "The most frequently used commands in the entire command history (divided according to given arguments) are..." "(Very long commands can cause line breaks, making the output difficult to read)"
-        fc -l 1 | awk '$1="";{CMD[$0]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | sort -S1% -nr -f | nl -n rn | head -n30 | column -t -N Rank,Count,Percent,Command,Arguments -R Rank,Count,Percent && printf '\n'
-        fi
+  Darwin) if [[ $1 = "" ]]; then
+             echo -en "$_msg" && echo -en "$_msg_long"
+             history | awk '$1="";{CMD[$2]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n10 && printf '\n'
+          elif [[ $1 = "-v" ]]
+             then echo -en "$_msg"
+             history 1 | awk '$1="";{CMD[$2]++;count++}END {for (a in CMD) print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n10 && printf '\n'
+          elif [[ $1 = "-vx" ]]
+             then echo -en "$_msg_vx"
+             fc -l 1 | awk '$1="";{CMD[$0]++;count++}END {for (a in CMD) print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n20 && printf '\n'
+          elif [[ $1 = "-h" ]]
+             then topcmd_help
+          elif [[ $1 = "-c" ]]
+             then history_conf
+          else
+             topcmd_invalid
+          fi
         ;;
-      "-c")
-        history_conf
+       *) if [[ $1 = "" ]]; then
+             echo -en "$_msg" && echo -en "$_msg_long"
+             history | awk '$1="";{CMD[$2]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n10 && printf '\n'
+          elif [[ $1 = "-v" ]];
+             then echo -en "$_msg"
+             history 1 | awk '$1="";{CMD[$2]++;count++}END {for (a in CMD) print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n10 && printf '\n'
+          elif [[ $1 = "-vx" ]]
+             then echo -en "$_msg_vx"
+             fc -l 1 | awk '$1="";{CMD[$0]++;count++}END {for (a in CMD) print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n20 && printf '\n'
+          elif [[ $1 = "-h" ]]
+             then topcmd_help
+          elif [[ $1 = "-c" ]]
+             then history_conf
+          else
+             topcmd_invalid
+          fi
         ;;
-      "-h"|"--help")
-        topcmd_help
-        ;;
-      *)
-        printf '\n\e[0;31m%s\e[0m\n' "  Invalid argument."
-        topcmd_invalid
-        printf '\e[0;31m%s\e[1;32m%s\e[0;31m%s\e[0m\n\n' "  Type" " topcmd -h " "for more info."
-        ;;
-    esac
-  fi
+esac
+else echo "Unknown OS type."
+fi
 }
 
 topcmd "$@"
