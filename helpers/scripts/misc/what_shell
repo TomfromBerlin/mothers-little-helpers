@@ -32,7 +32,7 @@ case "$myshell" in
   ksh) echo -e "Korn Shell ($(ps -cp "$$" -o command="")) - ver. ${KSH_VERSION}"  ;;
   lksh) echo -e "You should not use Legacy Korn Shell (lksh) as an interactive shell.\nIt is intended exclusively for running legacy scripts.\nUse mksh instead, or zsh and emulate ksh." ;;
   mksh) echo -e "MirBSD Korn Shell ($(ps -cp "$$" -o command="")) - ver. ${KSH_VERSION}"  ;;
-  pdksh) echo -e "Puplic Domain Korn Shell ($(ps -cp "$$" -o command="")) - ver. ${KSH_VERSION}"  ;;
+  pdksh) echo -e "Public Domain Korn Shell ($(ps -cp "$$" -o command="")) - ver. ${KSH_VERSION}"  ;;
   posh) echo -e "Policy-compliant Ordinary SHell ($(ps -cp "$$" -o command="")) - ver. ${POSH_VERSION}"  ;;
   yash) echo -e "Yet Another Shell ($(ps -cp "$$" -o command="")) - ver. ${YASH_VERSION}"  ;;
   zsh) echo -e "Z Shell ($(ps -cp "$$" -o command="")) - ver. ${ZSH_VERSION}"  ;;
