@@ -34,8 +34,10 @@ _msg_vx="\n\e[0;32m The following commands have been used most frequently (divid
 _msg_long="\e[0;33m Very long commands can cause line breaks, making the output difficult to read.\e[0m\n\n"
 # determine the operating system
 topcmd_os() {
-[[ -x "/usr/bin/uname" ]] && OS=$(uname)
+if [ -x "/usr/bin/uname" ] || [ -x "/bin/uname" ]; then
+OS=$(uname)
 export OS
+fi
 }
 # The _pager function can be used to distinguish between and configure different terminal pagers
 _pager() {
