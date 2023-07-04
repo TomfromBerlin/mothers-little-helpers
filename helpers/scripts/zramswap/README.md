@@ -6,7 +6,7 @@
 
 ## Description
 
- If you run a Raspberry Pi a SD card as system drive, you may want to consider to have the swapfile installed in your RAM to reduce write access to the SD card.
+ If you run a Raspberry Pi with a SD card as system drive, you may want to consider to have the swapfile installed in your RAM to reduce write access to the SD card.
 
 This will extend the life time of your SD card. This script installs a compressed RAM drive that is used as a swap drive.
 
@@ -67,7 +67,7 @@ Type `cat /sys/block/zram0/comp_algorithm` at command line (when zram module is 
 
 The resulting configuration could be look like the following:
 
-```
+```zsh
 ALGO=zstd               # algorithm to be used
 PERCENT=50              # a value between 30 and 50 seems to be a good choice in most cases
 PRIORITY=100            # the lower this value, the higher the priority
@@ -77,23 +77,24 @@ PRIORITY is hard coded because it is a background process and we do not want it 
 
 Now the service will be invoked with
 
-```
+```zsh
 sudo service zramswap reload
 ```
 
 and we do not forget to close the "if-then" statement with
-```
+
+```zsh
 fi
 ```
 
 Lets show the status of the service; it should be active and running
 
-```
+```zsh
 sudo service zramswap status
 ```
 Now we ask, if the service should be started at boot time. Probably "Yes".
 
-```
+```zsh
 echo -e "         Should the service enabled to be started"
 read -pr "         at system boot time?" ans_yn
    case "$ans_yn" in
@@ -106,13 +107,13 @@ sudo systemctl enable zramswap.service && echo -en "\e[1;36mDone."
 
 Let's see what memory and swap file stats say...
 
-```
+```zsh
 free -h
 ```
 
 ...and exit.
 
-```
+```zsh
 exit
 ```
 Thats all. You can download the script [here](zram-install.sh)
