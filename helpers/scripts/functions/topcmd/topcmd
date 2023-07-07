@@ -22,24 +22,20 @@
 # IN THE SOFTWARE.                                                             #
 #                                                                              #
 ################################################################################
-#                                                                              #
-#                  usage: topcmd [-v][-vx][-c][-h]                             #
-#                                                                              #
-################################################################################
-#
-# We write the info lines to be echoed in variables so that we only have to write it once
-# and use the variables within the function. It also makes the code a lot cleaner.
+#set -x
+# We write the info lines to be echoed in variables so that we only have to write
+# it once and use the variables within the function. It also makes the code a lot
+# cleaner.
 _msg="\n\e[0;32m The following commands were used most frequently...\e[0;0m\n\n"
 _msg_vx="\n\e[0;32m The following commands have been used most frequently (divided according to the arguments given)...\e[0m\n\n"
 _msg_long="\e[0;33m Very long commands can cause line breaks, making the output difficult to read.\e[0m\n\n"
 # determine the operating system
 topcmd_os() {
-if [ -x "/usr/bin/uname" ] || [ -x "/bin/uname" ]; then
-OS=$(uname)
+[[ -x "/usr/bin/uname" ]] && OS=$(uname)
 export OS
-fi
 }
-# The _pager function can be used to distinguish between and configure different terminal pagers
+# The _pager function can be used to distinguish between and configure different
+# terminal pagers
 _pager() {
 if [[ -x /bin/most ]]; then most +us -w
 else
@@ -52,7 +48,7 @@ cat <<EOH
   Usage: topcmd
          topcmd -v
          topcmd -vx
-         topcmd --help    # same as topcmd -h
+         topcmd --help
          topcmd -c
 
 EOH
@@ -65,18 +61,19 @@ _pager <<EOH
 
    Descrption:
 
-   "topcmd"     - will show the most frequently used commands
+   "topcmd"         - show the most frequently used commands
 
-   "topcmd -v"  - gives a more detailed output including the respective
-                  command arguments according to the internal history
+   "topcmd -v"      - gives a more detailed output including the respective
+                      command arguments according to the internal history
 
-   "topcmd -vx" - outputs a longer list of the most frequently used commands
+   "topcmd -vx"     - outputs a longer list of the most frequently used
+                      commands
 
-   "topcmd -c"  - shows an example configuration for the history function,
-                  which, if desired, can be written to a file sourced by
-                  $HOME/.zshrc or directly to $HOME/.zshrc
+   "topcmd -c"      - shows an example configuration for the history function,
+                      which, if desired, can be written to a file sourced by
+                      $HOME/.zshrc or directly to $HOME/.zshrc
 
-   "topcmd -h"  - show this text (same as "topcmd --help")
+   "topcmd --help"  - show this text
 
 
    The output depends strongly on how the history function is configured.
@@ -207,46 +204,68 @@ EOH
 history_conf() {
 cat <<EOH
 
-  Example configuration that works well with "topcmd [-<arg>]" (at least on Linux boxes).
-  If desired, you can add the following lines to $HOME/.zshrc
+  Example configuration that works well with "topcmd [-<arg>]" (at least on Linux
+  boxes). If desired, you can add the following lines to $HOME/.zshrc
 
-    HISTFILE=\$ZDOTDIR/.<file_name>  # without this the option "-vx" is more or less useless,
-                                     # replace <file_name> with your desired file name
+    HISTFILE=\$ZDOTDIR/.<file_name>  # without this the option "-vx" is more or
+                                     # less useless, replace <file_name> with
+                                     # your desired file name
 
-    HISTSIZE=15000                   # the maximum number of events stored in the internal history list
+    HISTSIZE=15000                   # the maximum number of events stored in the
+                                     # internal history list
 
-    SAVEHIST=10000                   # the maximum number of history events to save in the history file
+    SAVEHIST=10000                   # the maximum number of history events to
+                                     # save in the history file
                                      # ($HISTFILE)
 
     setopt EXTENDED_HISTORY          # save each command's beginning timestamp (in seconds since the epoch)
-                                     # and the duration (in seconds) to \$HISTFILE
+                                     # and the duration (in seconds) to
+                                     # \$HISTFILE
 
-    setopt HIST_APPEND               # attach the history of a new session to \$HISTFILE instead of replacing the history
+    setopt HIST_APPEND               # attach the history of a new session to
+                                     # \$HISTFILE instead of replacing the
+                                     # history
 
-    setopt HIST_EXPAND               # perform textual history expansion, csh-style, treating the character '!' specially.
+    setopt HIST_EXPAND               # perform textual history expansion,
+                                     # csh-style, treating the character '!'
+                                     # specially.
 
-    setopt HIST_SAVE_NO_DUPS         # when writing out the history file, older commands that duplicate newer ones are omitted
+    setopt HIST_SAVE_NO_DUPS         # when writing out the history file, older
+                                     # commands that duplicate newer ones are
+                                     # omitted
 
-    setopt HIST_EXPIRE_DUPS_FIRST    # If the internal history needs to be trimmed to add the current command line, this option
-                                     # will cause the oldest history event that has a duplicate to be lost before losing a
-                                     # unique event from the list
+    setopt HIST_EXPIRE_DUPS_FIRST    # If the internal history needs to be
+                                     # trimmed to add the current command line,
+                                     # this option will cause the oldest history
+                                     # event that has a duplicate to be lost
+                                     # before losing a unique event from the list
 
-    # setopt HIST_IGNORE_ALL_DUPS    # If a new command line being added to the history list duplicates an older one,
-                                     # the older command is removed from the list (even if it is not the previous event).
+    # setopt HIST_IGNORE_ALL_DUPS    # If a new command line being added to the
+                                     # history list duplicates an older one,
+                                     # the older command is removed from the list
+                                     # (even if it is not the previous event).
 
-    setopt HIST_FIND_NO_DUPS         # When searching for history entries in the line editor, do not display duplicates of
-                                     # a line previously found, even if the duplicates are not contiguous
+    setopt HIST_FIND_NO_DUPS         # When searching for history entries in the
+                                     # line editor, do not display duplicates of
+                                     # a line previously found, even if the
+                                     # duplicates are not contiguous
 
-    setopt HIST_IGNORE_SPACE         # remove command lines from the history list when the first character on the line is a space
+    setopt HIST_IGNORE_SPACE         # remove command lines from the history list
+                                     # when the first character on the line is a
+                                     # space
 
-    setopt HIST_NO_STORE             # tells the shell not to store history for fc commands in \$HISTFILE
+    setopt HIST_NO_STORE             # tells the shell not to store history for
+                                     # fc commands in \$HISTFILE
 
     setopt HIST_NO_FUNCTIONS         # tells the shell not to store function definitions
 
-    setopt SHARE_HISTORY             # imports new commands from the history file, and also causes your typed commands to
-                                     # be appended to the history file ($HISTFILE)
+    setopt SHARE_HISTORY             # imports new commands from the history
+                                     # file, and also causes your typed commands # to be appended to the history file
+                                     # ($HISTFILE)
 
-    setopt INC_APPEND_HISTORY        # new history lines are added to the \$HISTFILE incrementally (as soon as they are entered)
+    setopt INC_APPEND_HISTORY        # new history lines are added to the
+                                     # \$HISTFILE incrementally (as soon as they
+                                     # are entered)
 
 
   More under https://zsh.sourceforge.io/Doc/Release/Options.html#History
@@ -268,7 +287,7 @@ case "$OS" in
           elif [[ $1 = "-vx" ]]
              then echo -en "$_msg_vx"
              fc -ln 1 | awk '{CMD[$0]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | sort -S1% -nr -f | nl | head -n30 | column -t -N Rank,Count,Percent,Command,Arguments -R Rank,Count,Percent --table-truncate Arguments && printf '\n'
-          elif [[ $1 = "-h" ]]
+          elif [[ $1 = "--help" ]]
              then topcmd_help
           elif [[ $1 = "-c" ]]
              then history_conf
@@ -285,7 +304,7 @@ case "$OS" in
           elif [[ $1 = "-vx" ]]
              then echo -en "$_msg_vx"
              fc -l 1 | awk '$1="";{CMD[$0]++;count++}END {for (a in CMD) print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n20 && printf '\n'
-          elif [[ $1 = "-h" ]]
+          elif [[ $1 = "--help" ]]
              then topcmd_help
           elif [[ $1 = "-c" ]]
              then history_conf
@@ -293,6 +312,7 @@ case "$OS" in
              topcmd_invalid
           fi
         ;;
+
        *) if [[ $1 = "" ]]; then
              echo -en "$_msg" && echo -en "$_msg_long"
              history | awk '$1="";{CMD[$2]++;count++;}END { for (a in CMD)print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n10 && printf '\n'
@@ -302,7 +322,7 @@ case "$OS" in
           elif [[ $1 = "-vx" ]]
              then echo -en "$_msg_vx"
              fc -l 1 | awk '$1="";{CMD[$0]++;count++}END {for (a in CMD) print CMD[a] " " CMD[a]/count*100 "% " a;}' | grep -v "./" | column -c3 -s " " -t | sort -nr | nl |  head -n20 && printf '\n'
-          elif [[ $1 = "-h" ]]
+          elif [[ $1 = "--help" ]]
              then topcmd_help
           elif [[ $1 = "-c" ]]
              then history_conf
