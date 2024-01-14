@@ -11,6 +11,12 @@ This repository is provided to you in the hope that it will be helpful, but ever
 
 Some of the scripts may have their own license, if not, the [MIT license](https://opensource.org/license/mit/) applies.
 
+## Usage
+
+Copy the desired files into a dedicated directory where zsh can find it (e.g. `~/.config/zsh/plugins` or `~/zsh/plugins`; any directory in your fpath will be fine). Then (re)start zsh and the functions resp. scripts should be available on you system.
+
+**If you use any kind of framework, please refer to their documentation to find out the proper directory and possible difficulties.**
+
 ## Tips & Tricks
 
 - [How to make Debian 11 (bullseye) & unbound work together](/../../../../TomfromBerlin/Debian-Pihole-Unbound)
