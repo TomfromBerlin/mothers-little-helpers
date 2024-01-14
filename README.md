@@ -22,6 +22,22 @@ Some of the scripts may have their own license, if not, the [MIT license](https:
 
 - [allcolors](helpers/scripts/functions/allcolors) - shows the escape sequences for colors in the terminal
 - [chpwd](helpers/scripts/functions/chpwd) - auto-ls after each directory change (zsh only)
+- [temp_conv](helpers/scripts/functions/temp_conv) - Script to convert temperature values (Celsius, Fahrenheit, Kelvin). The output includes joules and electron volts. You will be asked to enter the value you want to convert and will receive all conversions as a result. For example, if you have a temperature in Fahrenheit and want to convert it to Kelvin, you need to run the script and enter "fc" when prompted and press `Enter`. The following prompt looks like this:
+```
+Please enter a value for Fahrenheit: 100
+```
+Enter a value and receive the output presenting the results. It looks like this:
+```
+The conversion formula is (100°F − 32) × 5/9 and gives 37.7778°C, which is 310.928 Kelvin, 4.29283e-21 Joules and 3.60816e+06 eV.`
+```
+You will be prompted for nessecary input and the output is colored. If you want to have background information type `absolute_zero` at the command line and press enter (you must not run the script for this function).
+For conversion type `temp_conv` at the command line, press Enter and use one of the following options (case insensitive):
+| Command | Option | Purpose |
+|:---------:|:---------:|:---------:|
+| `temp_conv` | `CF` | for Celsius -> Fahrenheit -> Kelvin -> Joule -> Electron Volt conversion |
+| `temp_conv` | `FC` | for Fahrenheit -> Celsius -> Kelvin -> Joule -> Electron Volt conversion |
+| `temp_conv` | `KC` | for Kelvin -> Celsius -> Fahrenheit -> Joule -> Electron Volt conversion |
+| `absolute_zero` |  | further information about the Third Law of Thermodynamics and more... |
 - [title](helpers/scripts/funtions/title) - show command in window title bar (zsh only)
 - [topcmd](helpers/scripts/functions/topcmd) - display frequently used commands of the current shell session or the entire command history.
 - [zprofiler](helpers/scripts/zprofiler) - profiling of the Z shell with instructions for configuration, if necessary
