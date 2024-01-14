@@ -1,0 +1,202 @@
+#!/bin/bash
+# shellcheck disable=SC2086
+################################################################################
+#                                                                              #
+# Copyright 2023 Thomas Bernard (https://github.com/TomfromBerlin)             #
+#                                                                              #
+# Permission is hereby granted, free of charge, to any person obtaining a copy #
+# of this software and associated documentation files (the “Software”), to     #
+# deal in the Software without restriction, including without limitation the   #
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or  #
+# sell copies of the Software, and to permit persons to whom the Software is   #
+# furnished to do so, subject to the following conditions:                     #
+#                                                                              #
+# The above copyright notice and this permission notice shall be included in   #
+# all copies or substantial portions of the Software.                          #
+#                                                                              #
+# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR   #
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,     #
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE  #
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER       #
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING      #
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS #
+# IN THE SOFTWARE.                                                             #
+#                                                                              #
+################################################################################
+#                                                                              #
+# Description:                                                                 #
+# Convert temperature values from Celsius to Fahrenheit and Kelvin and back.   #
+# You'll also get an output in joules and electron volt - just for fun.        #
+#                                                                              #
+# Usage: run 'bash /path/to/file/temp_conv' or                                 #
+#            'zsh /path/to/file/temp_conv'                                     #
+#        in your terminal. In Z shell you can put the file in a directory in   #
+#        your $fpath and use it as a function. In this case you should take    #
+#        care of the Z shell loading time.                                     #
+#                                                                              #
+################################################################################
+#set -x
+
+export LC_NUMERIC=C
+CELSIUS2KELVIN='273.15'
+KELVIN2eV='11604.5'
+KELVIN2JOULES="$(echo $KELVIN2JOULES | awk '{print (1.38064878066852/(10^23))}')" # ¯\_(ツ)_/¯
+caf='5/9'
+fac='9/5'
+summ='32'
+
+kelvin_info() {
+    echo -en "\n -------------------------------------------------------------------------------\n\n According to the new definition of the temperature unit (since May 2019), the\n Kelvin is no longer defined via the fixed point temperature of water.\n Instead, temperatures will then be defined with direct reference to energy.\n In doing so, we use the value of the Boltzmann constant k,\n so 1 Kelvin is equal to 1.38064878066852 x 10e-23 joules.\n\n The Celsius scale will have the same relation to the Kelvin after May 2019 as\n before.\n -------------------------------------------------------------------------------\n\n Enter \e[0;32mm\e[0m return to menu or any other key to quit:\e[32m " && read -r _input && echo -en "\e[0m"
+     case $_input in
+        m) temp_conv ;;
+        *) return ;;
+     esac
+}
+
+absolute_zero() {
+cat <<_info_
+
+-------------------------------------------------------------------------------
+
+                               Absolute zero
+
+  The third and last law of thermodynamics - also known as the Nernst theorem -
+  states that a system cannot be cooled to absolute zero.
+
+  At absolute zero, which corresponds to a temperature of
+
+         0 Kelvin or -273.15 °Celsius or -459.67 °Fahrenheit,
+
+  no more particles can oscillate.
+
+  However, this only happens in a perfect ice crystal, which extends to
+  infinity in a constant and perfect lattice structure.
+  Theoretically imaginable, practically not possible.
+
+  And why is this so? Let's take a look at a lattice structure.
+
+  Perfect crystals never occur in practice; imperfections, and even entire
+  amorphous material inclusions, can and do get "frozen in" at low temperatures,
+  so transitions to more stable states do not occur.
+
+  As soon as there is an imperfection, no matter how small, irregularities show
+  up. This is because the environment and thus the intermolecular forces change
+  for some particles. Particle 1, for example, has a different environment than
+  particle 2.
+
+  Now we can differentiate between places with low entropy and those with
+  higher entropy, i.e. where the disorder is greater and there are consequently
+  more oscillation possibilities - in our case, this would be particle 2.
+
+  Consequently, the entropy can never be really zero.
+
+   lim  ΔS = 0
+   T⟶ 0
+
+  That is, for a temperature close to absolute zero the entropy limit runs to
+  zero.
+
+  Even a system at absolute zero, if it could somehow be achieved, would still
+  possess quantum mechanical zero-point energy, the energy of its ground state
+  at absolute zero; the kinetic energy of the ground state cannot be removed.
+
+-------------------------------------------------------------------------------
+
+_info_
+echo -en "\n\n Enter \e[0;32mm\e[0m to return to menu,\n       \e[0;32mi\e[0m \e[0m for even more information\n       or any other key to quit:\e[32m " && read -r _input && echo -en "\e[0m"
+     case $_input in
+        m) temp_conv ;;
+        i) kelvin_info ;;
+        *) return ;;
+     esac
+}
+
+c2f() {
+  echo ""
+  echo -en " Please enter a value for \e[0;35mCelsius\e[0m: \e[0;36m" && read -r valc && echo -en "\e[0m"
+  if [[ $valc =~ ^[+-]?[0-9]+\,?[0-9]?*$ ]] ; then valc=${valc/,/.} ;fi
+  if [ "$(echo -e "$valc -273.15" | awk '{print ( $1 < $2 )}')" = 1 ] ; then echo -en "\n Values lower than \e[0;31m-273.15\e[0m for Celsius are not permissible, since -273.15°C equals 0 Kelvin, and according to the laws of thermodynamics 0 Kelvin is the lowest possible temperature.\n\n Press \e[0;32mr\e[0m to retry,\n       \e[0;32mi\e[0m for some nerdy information,\n       or any other key to quit: \e[32m" && read -r _input && echo -en "\e[0m"
+     case $_input in
+        r) c2f ;;
+        m) temp_conv ;;
+        i) absolute_zero ;;
+        *) return ;;
+     esac
+  elif [[ $valc =~ ^[+-]?[0-9]+\.?[0-9]?*$ ]] ; then
+  FAHRENHEIT=$(echo -en $valc | awk '{print ( '$valc' * '$fac' ) + '$summ'}')
+  KELVIN="$(echo -en $valc | awk '{print ( '$valc' + '$CELSIUS2KELVIN' )}')"
+  eV="$(echo -en $KELVIN | awk '{print ( '$KELVIN' * '$KELVIN2eV' )}')"
+  JOULES="$(echo -en $KELVIN | awk '{print ( '$KELVIN' * '$KELVIN2JOULES' )}')"
+  echo -en "\n The conversion formula is \e[1;33m($valc°C × $fac) + $summ\e[0m and gives \e[0;32m$FAHRENHEIT°F\e[0m, which is \e[0;32m$KELVIN Kelvin\e[0m, \e[0;32m$JOULES Joules\e[0m and \e[0;32m$eV eV\e[0m.\n\n" && valc="" && return
+  else echo -en "\n\e[0;31m No valid input!\e[0m\n Enter \e[1;32mr\e[0m to retry, any other key to quit: \e[0;32m" && read -r _input && echo -en "\e[0m"
+     case $_input in
+        r) c2f ;;
+        m) temp_conv ;;
+        *) return ;;
+     esac
+  fi
+}
+
+f2c() {
+  echo ""
+  echo -en " Please enter a value for \e[0;35mFahrenheit\e[0m: \e[0;36m" && read -r valf && echo -en "\e[0m"
+  if [[ $valf =~ ^[+-]?[0-9]+\,?[0-9]?*$ ]] ; then valf=${valf/,/.} ;fi
+  if [ "$(echo -e "$valf -459.67" | awk '{print ( $1 < $2 )}')" = 1 ] ; then echo -en "\n Values lower than \e[0;31m-459.67\e[0m for Fahrenheit are not permissible, since -459.67 equals 0 Kelvin, and according to the laws of thermodynamics 0 Kelvin is the lowest possible temperature.\n\n Press \e[0;32mr\e[0m to retry,\n       \e[0;32mi\e[0m for some nerdy information,\n       or any other key to quit: \e[35m" && read -r _input && echo -en "\e[0m"
+     case $_input in
+        r) f2c ;;
+        m) temp_conv ;;
+        i) absolute_zero ;;
+        *) return ;;
+     esac
+  elif [[ $valf =~ ^[+-]?[0-9]+\.?[0-9]?*$ ]] ; then
+  CELSIUS="$(echo -en $valf | awk '{ print ( '$valf' - '$summ' ) * '$caf' }')"
+  KELVIN="$(echo -en $CELSIUS | awk '{print ( '$CELSIUS' + '$CELSIUS2KELVIN' )}')"
+  eV="$(echo -en $KELVIN | awk '{print ( '$KELVIN' * '$KELVIN2eV' )}')"
+  JOULES="$(echo -en $KELVIN | awk '{print ( '$KELVIN' * '$KELVIN2JOULES' )}')"
+  echo -e "\n The conversion formula is \e[1;33m($valf°F − $summ) × $caf\e[0m and gives \e[0;32m$CELSIUS°C\e[0m, which is \e[0;32m$KELVIN Kelvin\e[0m, \e[0;32m$JOULES Joules\e[0m and \e[0;32m$eV eV\e[0m.\n\n" && valf="" && return
+  else echo -en "\n\e[0;31m No valid input!\e[0m\n Enter \e[0;32mr\e[0m to retry, any other key to quit: \e[0;32m" && read -r _input && echo -en "\e[0m"
+     case $_input in
+        r) f2c ;;
+        m) temp_conv ;;
+        *) return ;;
+     esac
+  fi
+}
+
+k2c() {
+  echo ""
+  echo -en " Please enter a value for \e[0;35mKelvin\e[0m: \e[0;36m" && read -r valkc && echo -en "\e[0m"
+  if [[ $valkc =~ ^[+-]?[0-9]+\,?[0-9]?*$ ]] ; then valkc=${valkc/,/.} ;fi
+  if [[ $valkc =~ ^[-][0-9]+\.?[0-9]?*$ ]] ; then echo -en "\n\n \e[0;31mNegative values\e[0m for Kelvin are not permissible, since according to the laws of thermodynamics 0 Kelvin is the lowest possible temperature.\n\n Press \e[0;32mr\e[0m to retry,\n       \e[0;32mi\e[0m for some nerdy information,\n       or any other key to quit: \e[32m" && read -r _input && echo -en "\e[0m"
+     case $_input in
+        r) k2c ;;
+        m) temp_conv ;;
+        i) absolute_zero ;;
+        *) return ;;
+     esac
+  elif [[ $valkc =~ ^[+]?[0-9]+\.?[0-9]?*$ ]]; then
+  CELSIUS="$(echo -en $valkc | awk '{ print ( '$valkc' - '$CELSIUS2KELVIN' ) }')"
+  FAHRENHEIT="$(echo -en $CELSIUS | awk '{print (( '$CELSIUS' * '$fac' ) + '$summ' ) }')"
+  eV="$(echo -en $valkc | awk '{print ( '$valkc' * '$KELVIN2eV' )}')"
+  JOULES="$(echo -en $valkc | awk '{print ( '$valkc' * '$KELVIN2JOULES' )}')"
+  echo -e "\n The conversion formula is \e[1;33m$valkc K − $CELSIUS2KELVIN\e[0m and gives \e[0;32m$CELSIUS°C\e[0m, which is \e[0;32m$FAHRENHEIT°F\e[0m, \e[0;32m$JOULES Joules\e[0m and \e[0;32m$eV eV\e[0m.\n\n" && valkc="" && return
+  else echo -en "\n\e[0;31m No valid input!\e[0m\n Enter \e[0;32mr\e[0m to retry, any other key to quit: \e[0;32m" && read -r _input && echo -en "\e[0m"
+     case $_input in
+        r) k2c ;;
+        m) temp_conv ;;
+        *) return ;;
+     esac
+  fi
+}
+
+temp_conv() {
+  echo -en "\n Enter \e[0;36mCF\e[0m for \e[0;36mCelsius\e[0;32m -> Fahrenheit -> Kelvin -> Joule -> Electron Volt\e[0m conversion\n       \e[0;36mFC\e[0m for \e[0;36mFahrenheit\e[0;32m -> Celsius -> Kelvin -> Joule -> Electron Volt\e[0m conversion\n       \e[0;36mKC\e[0m for \e[0;36mKelvin\e[0;32m -> Celsius -> Fahrenheit -> Joule -> Electron Volt\e[0m conversion\n\n  (case insensitive): \e[0;36m" && read -r _value && echo -en "\e[0m"
+     case "$_value" in
+        [C][F]|[c][f]) c2f ;;
+        [F][C]|[f][c]) f2c ;;
+        [K][C]|[k][c]) k2c ;;
+                    *) echo -e "\n  \e[0;31m   Abort!\e[0m\n" && return ;;
+     esac
+}
+
+temp_conv $"@"
