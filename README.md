@@ -3,8 +3,6 @@
 
 # Mothers Little Helpers
 
-**Do not clone this repository, it makes no sense. You should rather stare it, because it is just a collection of tips, tricks and scripts that you may need once or only once in a while.**
-
 ## Disclaimer
 
 This repository is provided to you in the hope that it will be helpful, but everything comes without any warranty and the owner of this repository is in no way responsible for any kind of harm, even if your cat dies while using one or more or all of these files.
