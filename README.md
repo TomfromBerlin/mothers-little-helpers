@@ -27,15 +27,16 @@ Copy the desired files into a dedicated directory where zsh can find it (e.g. `~
 - [allcolors](helpers/scripts/functions/allcolors) - shows the escape sequences for colors in the terminal
 - [chpwd](helpers/scripts/functions/chpwd) - auto-ls after each directory change (zsh only)
 - [temp_conv](helpers/scripts/functions/temp_conv) - Script to convert temperature values (Celsius, Fahrenheit, Kelvin). The output includes joules and electron volts. You will be asked to enter the value you want to convert and will receive all conversions as a result. For example, if you have a temperature in Fahrenheit and want to convert it to Kelvin, you need to run the script and enter "fc" when prompted and press `Enter`. The following prompt looks like this:
-```
-Please enter a value for Fahrenheit: 100
-```
+
+`Please enter a value for Fahrenheit: 100`
+
 Enter a value and receive the output presenting the results. It looks like this:
-```
-The conversion formula is (100°F − 32) × 5/9 and gives 37.7778°C, which is 310.928 Kelvin, 4.29283e-21 Joules and 3.60816e+06 eV.`
-```
+
+`The conversion formula is (100°F − 32) × 5/9 and gives 37.7778°C, which is 310.928 Kelvin, 4.29283e-21 Joules and 3.60816e+06 eV.`
+
 You will be prompted for nessecary input and the output is colored. If you want to have background information type `absolute_zero` at the command line and press enter (you must not run the script for this function).
 For conversion type `temp_conv` at the command line, press Enter and use one of the following options (case insensitive):
+
 | Command | Option | Purpose |
 |:---------:|:---------:|:---------:|
 | `temp_conv` | `CF` | for Celsius -> Fahrenheit -> Kelvin -> Joule -> Electron Volt conversion |
