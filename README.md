@@ -13,7 +13,7 @@ Some of the scripts may have their own license, if not, the [MIT license](https:
 
 ## Usage
 
-Copy the desired files into a dedicated directory where zsh can find it (e.g. `~/.config/zsh/plugins` or `~/zsh/plugins`; any directory in your fpath will be fine). Then (re)start zsh and the functions resp. scripts should be available on you system.
+Copy the desired files into a dedicated directory where zsh can find it (e.g. `~/.config/zsh/plugins` or `~/zsh/plugins`; any directory in your fpath will be fine). Then (re)start zsh and the functions resp. scripts should be available on your system.
 
 **If you use any kind of framework, please refer to their documentation to find out the proper directory and possible difficulties.**
 
