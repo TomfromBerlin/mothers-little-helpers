@@ -10,7 +10,7 @@ Example:
 
 `shlt 10` will start the active shell 10 times as a subshell and exit to parent shell.
 
-It is just a one-liner:
+It is just an one-liner:
 
 ```
 if [[ -z $1 ]]; then time $SHELL -i -c exit; else for i in {1..$1}; do time $SHELL -i -c exit; done; fi
