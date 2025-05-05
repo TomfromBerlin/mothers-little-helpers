@@ -54,6 +54,7 @@ Enter a value (e.g. `100`) and receive the output presenting the results. It loo
 - [title](helpers/scripts/funtions/title) - show command in window title bar (zsh only)
 - [topcmd](helpers/scripts/functions/topcmd) - display frequently used commands of the current shell session or the entire command history.
 - [zprofiler](helpers/scripts/zprofiler) - profiling of the Z shell with instructions for configuration, if necessary
+- [checkport](helpers/scripts/functions/checkport) - Tiny function for zsh that shows which processes are listening or communicating on which TCP ports. It determines whether the system language is German. If this is the case, the output is in German, otherwise in English.
 - ~[zsh_wifi_signal](helpers/scripts/functions/zsh_wifi_signal) - shows wifi signal strength in a terminal (zsh only)~
 
 ## Scripts
