@@ -1,0 +1,129 @@
+#!/bin/env zsh
+################################################################################
+#                                                                              #
+# Copyright 2025 Thomas Bernard (https://github.com/TomfromBerlin)             #
+#                                                                              #
+# Permission is hereby granted, free of charge, to any person obtaining a copy #
+# of this software and associated documentation files (the “Software”), to     #
+# deal in the Software without restriction, including without limitation the   #
+# rights to use, copy, modify, merge, publish, distribute, sublicense, and/or  #
+# sell copies of the Software, and to permit persons to whom the Software is   #
+# furnished to do so, subject to the following conditions:                     #
+#                                                                              #
+# The above copyright notice and this permission notice shall be included in   #
+# all copies or substantial portions of the Software.                          #
+#                                                                              #
+# THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR   #
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,     #
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE  #
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER       #
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING      #
+# FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS #
+# IN THE SOFTWARE.                                                             #
+#                                                                              #
+################################################################################
+# Funktion: checkport                                                          #
+# Benutzung: checkport an der Eingabeaufforderung, optional kann ein Port      #
+# angegeben werden                                                             #
+# Beschreibung: Zeigt an, welche Prozesse auf welchen TCP-Ports lauschen oder  #
+# kommunizieren.                                                               #
+# Optionaler Parameter: Portnummer – wenn angegeben, werden nur zugehörige     #
+# Einträge gezeigt.                                                            #
+# Eingabe am Prompt: checkport [Portnummer]                                    #
+# Mit Hilfe von ChatGPT (OpenAI) erstellt (https://openai.com/chatgpt)       #
+################################################################################
+# unterstützt durch ChatGPT (OpenAI) (https://openai.com/chatgpt)              #
+################################################################################
+# Function: checkport                                                          #
+# Description: Shows which processes are listening on which TCP ports or       #
+# communicate.                                                                 #
+# Optional parameter: Port number - if specified, only associated entries are  #
+# shown.                                                                       #
+# Enter at the prompt: checkport [port number]                                 #
+# Created with the help of ChatGPT (OpenAI) (https://openai.com/chatgpt)       #
+################################################################################
+
+checkport() {
+# Funktion zum Prüfen, ob die Sprache Deutsch ist
+# Function to check whether the language is German
+is_german() {
+  [[ "$LANG" == de* || "$LC_MESSAGES" == de* ]]
+}
+
+if is_german; then
+  # Deutsche Strings
+  HEADER_LOCAL="lokal"
+  HEADER_REMOTE="entfernt"
+  HEADER_PORT="Ports"
+  HEADER_PID="PID"
+  HEADER_USER="Benutzer"
+  HEADER_COMMAND="Befehl"
+  HEADER_Program="Programm oder"
+  HEADER_STATE="Status"
+  MSG_NO_PORT="\n Kein Port angegeben, alle Verbindungen werden angezeigt.\n Gib einen Port an, um nur Details für den angegebenen Port zu sehen."
+  MSG_PORT="\n \e[0;32m Hier die Details für Port: \e[0;33m$1\e[0m"
+else
+  # English Strings
+  HEADER_LOCAL="local"
+  HEADER_REMOTE="remote"
+  HEADER_PORT="Ports"
+  HEADER_PID="PID"
+  HEADER_USER="User"
+  HEADER_COMMAND="COMMAND"
+  HEADER_Program="Program or"
+  HEADER_STATE="State"
+  MSG_NO_PORT="\n No port specified, all connections are displayed.\n Specify a port to only see details for the specified port."
+  MSG_PORT="\n \e[0;32mHere are the details for Port: \e[0;33m$1\e[0m"
+fi
+
+  local port="$1"     # Variable für Portnummer, falls vom Benutzer übergeben / Variable for port number, if specified by the user
+  local query         # Variable für die Ausgabe von lsof / Variable for lsof output
+
+  if [[ -n "$port" ]]; then
+    # Wenn ein Port angegeben wurde, beschränke die Ausgabe auf diesen Port
+    # If a port has been specified, restrict the output to this port
+    echo -e "$MSG_PORT"
+    echo -e "\e[0;36m"
+    query=$(lsof -nP -iTCP:"$port" -sTCP:LISTEN,ESTABLISHED 2>/dev/null)
+  else
+    # Wenn kein Port angegeben ist, zeige alle offenen TCP-Verbindungen mit Status LISTEN oder ESTABLISHED
+    # If no port is specified, show all open TCP connections with status LISTEN or ESTABLISHED
+    echo -e "\e[0;32m$MSG_NO_PORT"
+    echo -e "\e[0;36m"
+    query=$(lsof -nP -iTCP -sTCP:LISTEN,ESTABLISHED 2>/dev/null)
+  fi
+  # Ausgabe/Output
+
+
+# Titelzeile
+# Tabellenüberschriften/Table Header
+printf "+%-14s-+-%-6s-+-%-8s-+-%-10s---%-11s-+-%-14s+\n" \
+  "--------------" "------" "--------" "----------" "-----------" "--------------"
+printf "|%-14s | %-6s | %-8s | %-6s   %-15s | %-14s|\n" "$HEADER_Program" "" "" "" "$HEADER_PORT" ""
+printf "|%-14s | %-6s | %-8s | %-10s | %-11s | %-14s|\n" "$HEADER_COMMAND" "$HEADER_PID" "$HEADER_USER" "$HEADER_LOCAL" "$HEADER_REMOTE" "$HEADER_STATE"
+printf "|%-14s-+-%-6s-+-%-8s-+-%-10s-+-%-11s-+-%-14s|\n" \
+  "--------------" "------" "--------" "----------" "-----------" "--------------"
+
+  echo "$query" | awk '
+    /TCP/ {
+      cmd=$1; pid=$2; user=$3; state=$(NF)
+      name=$(NF-1)
+      local_port=""; remote_port="-"
+
+      if (name ~ /->/) {
+        split(name, parts, "->")
+        sub(/.*:/, "", parts[1])
+        sub(/.*:/, "", parts[2])
+        local_port=parts[1]
+        remote_port=parts[2]
+      } else {
+        sub(/.*:/, "", name)
+        local_port=name
+      }
+
+      printf "|%-14s | %-6s | %-8s | %-10s | %-11s | %-14s|\n", cmd, pid, user, local_port, remote_port, state
+    }'
+printf "+%-14s-+-%-6s-+-%-8s-+-%-10s-+-%-11s-+-%-14s+\n" \
+  "--------------" "------" "--------" "----------" "-----------" "--------------"
+  echo -e "\e[0m\n"
+}
