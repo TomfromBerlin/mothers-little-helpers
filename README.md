@@ -64,7 +64,7 @@ Enter a value (e.g. `100`) and receive the output presenting the results. It loo
 - [zrecompile](helpers/scripts/misc/zrecompile) - compile functions and dot-files, if necessary (zsh only)
 - [PS4-demo](helpers/scripts/misc/PS4_demo.sh) - demonstrate the functionality of the PS4 prompt variable
 - [what_shell](helpers/scripts/misc/what_shell) - show the (sub-)shell that is currently used. usage: `source what_shell` (the file should live somewhere in your $PATH)
-- [progress bar](helpers/scripts/progress bar) - a progress bar purely written as a shell script
+- [progress bar](https://github.com/TomfromBerlin/mothers-little-helpers/tree/main/helpers/scripts/progress%20bar) - a progress bar purely written as a shell script
 
 ## Information tools for command line
 
