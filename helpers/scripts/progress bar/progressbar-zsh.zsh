@@ -54,17 +54,6 @@ progress-bar() {
   done
   bar+=']'
 
-# # remove the last char of the bar and redraw the bar then exit
-#     if (( perc_done == 100 )); then
-#     local bar="["
-#     for ((i=0; i<length; i++)); do
-#       bar+=$bar_char1
-#     done
-#     bar+="]"
-#     printf '%s\t%s/%s\t%s%s%%%s\r' "$bar" "$current" "$len" "$perc_color" "$perc_done" "$NC"
-#     return
-#     fi
-
       printf '\e[s' # save the cursor position
         printf '\e[%d;%dH' "$LINES" 0 # move cursor to bottom line
           printf '\r%s\t%s/%s\t%s%s%%%s' "$bar" "$current" "$len" "$perc_color" "$perc_done" "$NC"
