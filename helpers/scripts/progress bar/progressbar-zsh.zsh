@@ -1,64 +1,80 @@
 #!/usr/bin/env zsh
 # set -x
-BATCHSIZE=2
+BATCHSIZE=500
 # ---------------------------------------------
 # Pac‑Man‑Style Progress Bar
 # ---------------------------------------------
 set -u
 
-fatal() {
-    echo '[FATAL]' "$@" >&2
-    exit 1
+help() {
+  local GREEN=$'\e[0;32;40m'
+  local BLUE=$'\e[0;34;40m'
+  local NC=$'\e[0m'   # reset color
+
+  echo
+  echo -en " Usage: progressbar.sh ${GREEN}-b ${BLUE}[positive integer]${NC}  - How many files should be processed at a time\n"
+  echo
+  exit 1
 }
 
-# -------------------------------------------------
-# progress-bar <current> <len>
-# -------------------------------------------------
 progress-bar() {
   local current=$1
   local len=$2
+  local COLUMNS=$(tput cols)
+  local LINES=$(tput lines)
+
   local GREEN=$'\e[0;32;40m'
   local BROWN=$'\e[0;33;40m'
   local YELLOW=$'\e[1;33;40m'
   local RED=$'\e[0;31;40m'
   local NC=$'\e[0m'                # reset color
-  local pm_char1="${YELLOW}C${NC}"
-  local pm_char2="${YELLOW}c${NC}"
-  local bar_char1="${BROWN}. ${NC}"
-  local bar_char2="${GREEN}o ${NC}"    # · $'\u00B7'
-  local length=50
+
+  local pm_char1="${YELLOW}C${NC}"    # this is one of two characters for the animation
+  local pm_char2="${YELLOW}c${NC}"    # this is the second character for the animation
+  local bar_char1="${BROWN}.${NC}"    # this character apears behind Pac-Man
+  local bar_char2="${GREEN}o${NC}"    # this character is eaten by Pac-Man
+#  local bar_char2="${GREEN}$·${NC}"    # you can also try middle-dot
+#  local bar_char2="${GREEN}$( printf $'\u00B7' )${NC}"    # with UTF-8 code -> ·
+
   local perc_done=$((current * 100 / len))
+
+  local suffix
+        suffix=$(printf ' %d / %d (%d%%)' "$current" "$len" "$perc_done")
+  local length=$(( COLUMNS - 2 - ${#suffix} ))
+     (( length < 0 )) && length=0
+
   local num_bars=$((perc_done * length / 100))
+
   local pos=$((num_bars - 1))
-  (( pos < 0 )) && pos=0
+    (( pos < 0 )) && pos=0
 
   local perc_color
     if (( perc_done < 31 )); then
-        perc_color=${RED}
+          perc_color=${RED}
     elif (( perc_done < 61 )); then
-        perc_color=${YELLOW}
+          perc_color=${YELLOW}
     else
-        perc_color=${GREEN}
+          perc_color=${GREEN}
     fi
 # progress bar
-    local i bar='['
-    for ((i=0; i<length; i++)); do
+    bar='['
+    local i
+    for ((i = 0; i < length; i++)); do
       if (( i < pos )); then
           bar+=$bar_char1 # behind Pac-Man
       elif (( i == pos && perc_done < 100 )); then
       # Pac-Man
-          (( i % 2 == 0 )) && bar+=$pm_char1 || bar+=$pm_char2 ||
-    else
-      bar+=$bar_char2 # in front of Pac-Man
-    fi
-  done
-  bar+=']'
-
-      printf '\e[s' # save the cursor position
-        printf '\e[%d;%dH' "$LINES" 0 # move cursor to bottom line
-          printf '\r%s\t%s/%s\t%s%s%%%s' "$bar" "$current" "$len" "$perc_color" "$perc_done" "$NC"
-        printf '\e[K' #  clear the line
-      printf '\e[u' #  restores the cursor to the last saved position
+          (( i % 3 == 0 )) && bar+=$pm_char1 || bar+=$pm_char2
+      else
+          bar+=$bar_char2 # in front of Pac-Man
+      fi
+    done
+    bar+=']'
+    printf '\e[s' # save the cursor position
+      printf '\e[%d;1H' "$LINES"  #  -> bottom row, first column  (1-based!)
+        printf '%s %s/%s %s%s%%%s' "$bar" "$current" "$len" "$perc_color" "$perc_done" "$NC"
+      printf '\e[K' #  clear the line
+    printf '\e[u' #  restores the cursor to the last saved position
 }
 
 # we define a function because we do not want to break existing color definitions
@@ -76,20 +92,37 @@ batchsize () {
   fi
 }
 
+process-files() {
+    local files=("$@")
+
+    local file
+    for file in "${files[@]}"; do
+#   you can add your code here, i.e., 'cp $file /dev/null'
+        printf '%s\n' "-> $file"
+    done
+#	sleep .1
+}
+
 # initialise terminal
 init-term() {
+    local COLUMNS=$(tput cols)
+    local LINES=$(tput lines)
+
     printf '\n' # ensure we have space for the progress bar
       printf '\e[s' # save the cursor location
-        printf '\e[%d;%dr' 0 "$((LINES -1))" # set the scrollable region (margin)
+        printf '\e[%d;%dr' 1 "$((LINES -1))" # set the scrollable region (margin)
       printf '\e[u' #  restore the cursor location
     printf '\e[1A' # move cursor up
     tput civis
 }
 
 deinit-term() {
+    local COLUMNS=$(tput cols)
+    local LINES=$(tput lines)
+
     printf '\e[s' # save the cursor location
-      printf '\e[%d;%dr' 0 "$LINES" # reset the scrollable region (margin)
-      printf '\e[%d;%dH' "$LINES" 0 # move cursor to bottom line
+      printf '\e[%d;%dr' 1 "$LINES" # reset the scrollable region (margin)
+        printf '\e[%d;%dH' "$LINES" 1 # move cursor to bottom line
       printf '\e[0K' #  clear the line
     printf '\e[u' #  reset the cursor location
     tput cnorm
@@ -97,18 +130,22 @@ deinit-term() {
 
 main() {
 
-    local OPTARG OPTIND opt
-    while getopts 'b:' opt; do
-          case "$opt" in
-                  b) BATCHSIZE=$OPTARG;;
-                  *) fatal 'bad option';;
-          esac
-    done
+      local OPTARG OPTIND opt
+      while getopts 'b:' opt; do
+            case "$opt" in
+                    b) BATCHSIZE=$OPTARG;;
+                    *) help;;
+            esac
+      done
 
       setopt LOCAL_OPTIONS UNSET # declare setopt parameters locally and restore it after function call
       setopt DOT_GLOB GLOB_STAR_SHORT EXTENDED_GLOB extendedglob
 
+      local COLUMNS=$(tput cols) # determine the number of columns of the terminal window
+      local LINES=$(tput lines)  # determine the number of lines of the terminal window
+
       trap deinit-term EXIT
+      trap init-term
       init-term
 
       printf 'Searching files…'
@@ -122,9 +159,10 @@ main() {
       local NC=$'\e[0m'
 
       batchsize
-
+      local i
       for ((i=0; i < len; i += BATCHSIZE)); do
         progress-bar "$((i+1))" "$len"
+        process-files "${files[@]:$((i)):$BATCHSIZE}"
       done
 
       # Completing the progress bar regardless of the size of the BATCHSIZE variable
@@ -132,4 +170,6 @@ progress-bar "$len" "$len"
 }
 
 main "$@"
-printf '\n\nDone!\n'
+GREEN=$'\e[0;32;40m'
+NC=$'\e[0m'
+printf '%s\n' ${GREEN}"Done!"${NC} && GREEN= && NC=
