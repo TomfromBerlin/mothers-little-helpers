@@ -34,7 +34,8 @@ help() {
   local NC=$'\e[0m'   # reset color
 
   echo
-  echo -en " Usage: progressbar.sh ${GREEN}-b ${BLUE}[positive integer]${NC}  - How many files should be processed at a time\n"
+  echo -en " Usage: [zsh] progressbar-zsh ${GREEN}-b ${BLUE}[positive integer]${NC}  - How many files should be processed at a time."
+  echo -en " You can mark the file as executable (chmod +x progressbar-zsh) to run the script without the zsh prefix.\n"
   echo
   exit 1
 }
