@@ -4,7 +4,29 @@ BATCHSIZE=500
 # ---------------------------------------------
 # Pac‑Man‑Style Progress Bar
 # ---------------------------------------------
-set -u
+# set -u
+unset x
+
+has_colors() {
+  if (( $+HAS_COLORS )); then
+    :
+  else
+    case $TERM in
+      *-256color) typeset -g HAS_COLORS=1 ;;
+      vt100|dumb) typeset -g HAS_COLORS=0 ;;
+      *)
+        local colors
+        case $OSTYPE in
+          freebsd*|dragonfly*) colors=$(tput Co) ;;
+          *) colors=$(tput colors) ;;
+        esac
+        typeset -g HAS_COLORS=$(( colors >= 8 ))
+        ;;
+    esac
+  fi
+  (( HAS_COLORS ))
+}
+has_colors "$@"
 
 help() {
   local GREEN=$'\e[0;32;40m'
@@ -15,6 +37,13 @@ help() {
   echo -en " Usage: progressbar.sh ${GREEN}-b ${BLUE}[positive integer]${NC}  - How many files should be processed at a time\n"
   echo
   exit 1
+}
+
+############################################################
+# Redraw prompt when terminal size changes
+############################################################
+TRAPWINCH() {
+  zle && zle -R
 }
 
 progress-bar() {
@@ -85,10 +114,18 @@ batchsize () {
 
   if
     [[ $BATCHSIZE -lt 1 ]] ; then
-      printf '\n%s%s%s\n%s\n\n' "BATCHSIZE must be greater than "${RED} ${BATCHSIZE} ${NC}"." "BATCHSIZE is set to 1." && BATCHSIZE=1 && printf '%s%s\n\n' "Processing "${GREEN}${BATCHSIZE}${NC}" file at a time"
-    elif [[ $BATCHSIZE == 1 ]] ; then printf '%s%s\n\n' "Processing "${GREEN}${BATCHSIZE}${NC}" file at a time"
+    local OPTARG OPTIND opt
+      while getopts 'b:' opt; do
+            case "$opt" in
+                    b) BATCHSIZE=$OPTARG;;
+                    *) help;;
+            esac
+      done
+
+      printf '\n%s%s%s\n%s\n' "BATCHSIZE must be greater than "${RED} ${BATCHSIZE} ${NC}"." "BATCHSIZE is set to 1." && BATCHSIZE=1 && printf '%s%s\n\n' "Processing "${GREEN}${BATCHSIZE}${NC}" file at a time"
+    elif [[ $BATCHSIZE == 1 ]] ; then printf '%s%s\n' "Processing "${GREEN}${BATCHSIZE}${NC}" file at a time"
     else
-      printf '\n%s\n\n' "Processing batch of "${GREEN}${BATCHSIZE}${NC}" files"
+      printf '\n%s\n' "Processing batch of "${GREEN}${BATCHSIZE}${NC}" files"
   fi
 }
 
@@ -137,9 +174,18 @@ main() {
                     *) help;;
             esac
       done
-
-      setopt LOCAL_OPTIONS UNSET # declare setopt parameters locally and restore it after function call
-      setopt DOT_GLOB GLOB_STAR_SHORT EXTENDED_GLOB extendedglob
+#
+# Infomation about the setopt parameters:
+#       LOCAL_OPTIONS UNSET # declare setopt parameters locally and restore it after function call
+#       DOT_GLOB # Do not require a leading ‘.’ in a filename to be matched explicitly.
+#       GLOB_STAR_SHORT # When this option is set and the default zsh-style globbing is in effect, the pattern ‘**/*’ can be abbreviated to ‘**’ and the pattern ‘***/*’ can be abbreviated to ***. Hence ‘**.c’ finds a file ending in .c in any subdirectory, and ‘***.c’ does the same while also following symbolic links. A / immediately after the ‘**’ or ‘***’ forces the pattern to be treated as the unabbreviated form.
+#       extendedglob
+#       EXTENDED_GLOB # Treat the ‘#’, ‘~’ and ‘^’ characters as part of patterns for filename generation, etc. (An initial unquoted ‘~’ always produces named directory expansion.)
+#
+# We write this in two lines
+#
+      setopt LOCAL_OPTIONS UNSET
+      setopt DOT_GLOB GLOB_STAR_SHORT EXTENDED_GLOB extendedglob NULLGLOB
 
       local COLUMNS=$(tput cols) # determine the number of columns of the terminal window
       local LINES=$(tput lines)  # determine the number of lines of the terminal window
@@ -149,18 +195,18 @@ main() {
       init-term
 
       printf 'Searching files…'
-      files=(./**/*.*)                 # Array with all files
-      len=${#files[@]}
-      printf '\r'
-      printf 'Found '$len' files.\n'
-
+      files=(./**/*)                 # Array with all files in the working directory and its subdirectories
+      len=${#files[@]}      
+      
       local GREEN=$'\e[0;32;40m'
       local RED=$'\e[0;31;40m'
       local NC=$'\e[0m'
 
-      batchsize
       local i
       for ((i=0; i < len; i += BATCHSIZE)); do
+        printf '\n'
+        printf '%s\n' 'Found '$len' files.'
+        batchsize
         progress-bar "$((i+1))" "$len"
         process-files "${files[@]:$((i)):$BATCHSIZE}"
       done
