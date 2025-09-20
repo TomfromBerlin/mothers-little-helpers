@@ -1,5 +1,3 @@
-|-|-|
-
 # Mothers Little Helpers
 
 ## Disclaimer
