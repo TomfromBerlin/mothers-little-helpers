@@ -5,7 +5,7 @@ BATCHSIZE=500
 # Pac‑Man‑Style Progress Bar
 # ---------------------------------------------
 # set -u
-unset x
+# unset x
 
 has_colors() {
   if (( $+HAS_COLORS )); then
@@ -46,6 +46,7 @@ help() {
 TRAPWINCH() {
   zle && zle -R
 }
+TRAPWINCH "$@"
 
 progress-bar() {
   local current=$1
@@ -94,7 +95,7 @@ progress-bar() {
           bar+=$bar_char1 # behind Pac-Man
       elif (( i == pos && perc_done < 100 )); then
       # Pac-Man
-          (( i % 3 == 0 )) && bar+=$pm_char1 || bar+=$pm_char2
+          (( i % 2 == 0 )) && bar+=$pm_char1 || bar+=$pm_char2
       else
           bar+=$bar_char2 # in front of Pac-Man
       fi
@@ -107,37 +108,31 @@ progress-bar() {
     printf '\e[u' #  restores the cursor to the last saved position
 }
 
-# we define a function because we do not want to break existing color definitions
 batchsize () {
-  local GREEN=$'\e[0;32;40m'
-  local RED=$'\e[0;31;40m'
-  local NC=$'\e[0m'
+   local GREEN=$'\e[0;32;40m'
+   local RED=$'\e[0;31;40m'
+   local NC=$'\e[0m'
 
-  if
+   printf '\n%s\n' 'Found '$len' files.'
+
+   if
     [[ $BATCHSIZE -lt 1 ]] ; then
-    local OPTARG OPTIND opt
-      while getopts 'b:' opt; do
-            case "$opt" in
-                    b) BATCHSIZE=$OPTARG;;
-                    *) help;;
-            esac
-      done
-
-      printf '\n%s%s%s\n%s\n' "BATCHSIZE must be greater than "${RED} ${BATCHSIZE} ${NC}"." "BATCHSIZE is set to 1." && BATCHSIZE=1 && printf '%s%s\n\n' "Processing "${GREEN}${BATCHSIZE}${NC}" file at a time"
-    elif [[ $BATCHSIZE == 1 ]] ; then printf '%s%s\n' "Processing "${GREEN}${BATCHSIZE}${NC}" file at a time"
+        BATCHSIZE=1 && printf '\r%s\n' "Processing "${GREEN}$"one (1)"${NC}" file at a time"
+    elif
+    [[ $BATCHSIZE == 1 ]] ; then
+       printf '\r%s\n' "Processing "${GREEN}"one (1)"${NC}" file at a time"
     else
-      printf '\n%s\n' "Processing batch of "${GREEN}${BATCHSIZE}${NC}" files"
-  fi
+       printf '\r%s\n' "Processing batch of "${GREEN}${BATCHSIZE}${NC}" files"
+   fi
 }
 
 process-files() {
-    local files=("$@")
-
-    local file
-    for file in "${files[@]}"; do
+   local files=("$@")
+   local file
+   for file in "${files[@]}"; do
 #   you can add your code here, i.e., 'cp $file /dev/null'
-        printf '%s\n' "-> $file"
-    done
+     printf '\r%s\n' "-> $file"
+   done
 #	sleep .1
 }
 
@@ -151,7 +146,7 @@ init-term() {
         printf '\e[%d;%dr' 1 "$((LINES -1))" # set the scrollable region (margin)
       printf '\e[u' #  restore the cursor location
     printf '\e[1A' # move cursor up
-    tput civis
+    tput civis # make cursor invisible
 }
 
 deinit-term() {
@@ -163,8 +158,15 @@ deinit-term() {
         printf '\e[%d;%dH' "$LINES" 1 # move cursor to bottom line
       printf '\e[0K' #  clear the line
     printf '\e[u' #  reset the cursor location
-    tput cnorm
+    tput cnorm # make cursor visible
 }
+
+finish () {
+ local GREEN=$'\e[0;32;40m'
+ local NC=$'\e[0m'                # reset color
+
+ printf '%s\n' ${GREEN}"Done!"${NC}
+ }
 
 main() {
 
@@ -195,28 +197,28 @@ main() {
       trap init-term
       init-term
 
-      printf 'Searching files…'
-      files=(./**/*)                 # Array with all files in the working directory and its subdirectories
-      len=${#files[@]}      
-      
       local GREEN=$'\e[0;32;40m'
       local RED=$'\e[0;31;40m'
-      local NC=$'\e[0m'
+      local NC=$'\e[0m'                # reset color
+
+      if
+        [[ $BATCHSIZE -lt 1 ]] ; then
+        printf '\n%s%s%s\n%s\n' "BATCHSIZE of "${RED} ${BATCHSIZE} ${NC}" is not valid." "BATCHSIZE will be set to "${GREEN}"1"${NC}"."
+      fi
+      printf '\n%s%s%s' "Searching files in "${GREEN} $(pwd) ${NC}" and its subdirectories…"
+      files=(./**/*)                 # Array with all files in the working directory and its subdirectories. You may want to adjust this to your needs,e.g., './**/*.tmp'
+      len=${#files[@]}
 
       local i
       for ((i=0; i < len; i += BATCHSIZE)); do
-        printf '\n'
-        printf '%s\n' 'Found '$len' files.'
         batchsize
         progress-bar "$((i+1))" "$len"
         process-files "${files[@]:$((i)):$BATCHSIZE}"
       done
 
       # Completing the progress bar regardless of the size of the BATCHSIZE variable
-progress-bar "$len" "$len"
+      progress-bar "$len" "$len"
 }
 
 main "$@"
-GREEN=$'\e[0;32;40m'
-NC=$'\e[0m'
-printf '%s\n' ${GREEN}"Done!"${NC} && GREEN= && NC=
+finish "$@"
