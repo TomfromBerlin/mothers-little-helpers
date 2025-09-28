@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/env zsh
 # shellcheck disable=SC2086
 ################################################################################
 #                                                                              #
-# Copyright 2023 Thomas Bernard (https://github.com/TomfromBerlin)             #
+# Copyright 2023-2025 Thomas Bernard (https://github.com/TomfromBerlin)        #
 #                                                                              #
 # Permission is hereby granted, free of charge, to any person obtaining a copy #
 # of this software and associated documentation files (the “Software”), to     #
@@ -31,30 +31,70 @@
 # Usage: run 'bash /path/to/file/temp_conv' or                                 #
 #            'zsh /path/to/file/temp_conv'                                     #
 #        in your terminal. In Z shell you can put the file in a directory in   #
-#        your $fpath and use it as a function. In this case you should take    #
-#        care of the Z shell loading time.                                     #
+#        your $fpath and use it as a function (yes, it works even with that    #
+#        shebang). In this case you may take care of the Z shell loading time. #
 #                                                                              #
 ################################################################################
 #set -x
 
+has_colors() {
+  if [[ -n ${HAS_COLORS+x} ]]; then
+    :
+  else
+    case $TERM in
+      *-256color) declare -g HAS_COLORS=1 ;;
+      vt100|dumb) declare -g HAS_COLORS=0 ;;
+      *)
+        local colors
+        case $OSTYPE in
+          freebsd*|dragonfly*) colors=$(tput Co) ;;
+          *) colors=$(tput colors) ;;
+        esac
+        declare -g HAS_COLORS=1
+        ;;
+    esac
+  fi
+  (( HAS_COLORS ))
+}
+has_colors "$@"
+
 export LC_NUMERIC=C
 CELSIUS2KELVIN='273.15'
 KELVIN2eV='11604.5'
-KELVIN2JOULES="$(echo $KELVIN2JOULES | awk '{print (1.38064878066852/(10^23))}')" # ¯\_(ツ)_/¯
-caf='5/9'
-fac='9/5'
+KELVIN2JOULES="$(echo | awk '{print (1.38064878066852 * (10^-23))}')" # ¯\_(ツ)_/¯
+FAHRENHEIT_ROTCAF='5/9'
+FAHRENHEIT_FACTOR='9/5'
 summ='32'
 
 kelvin_info() {
-    echo -en "\n -------------------------------------------------------------------------------\n\n According to the new definition of the temperature unit (since May 2019), the\n Kelvin is no longer defined via the fixed point temperature of water.\n Instead, temperatures will then be defined with direct reference to energy.\n In doing so, we use the value of the Boltzmann constant k,\n so 1 Kelvin is equal to 1.38064878066852 x 10e-23 joules.\n\n The Celsius scale will have the same relation to the Kelvin after May 2019 as\n before.\n -------------------------------------------------------------------------------\n\n Enter \e[0;32mm\e[0m return to menu or any other key to quit:\e[32m " && read -r _input && echo -en "\e[0m"
+cat <<_info1_
+ -------------------------------------------------------------------------------
+ According to the new definition of the temperature unit (since May 2019), the
+ Kelvin is no longer defined via the fixed point temperature of water.
+ Instead, temperatures will then be defined with direct reference to energy.
+ In doing so, we use the value of the Boltzmann constant k, so 1 Kelvin is equal
+ to 1.38064878066852 x 10e-23 joules.
+ The Celsius scale will have the same relation to the Kelvin after May 2019 as
+ before.
+ -------------------------------------------------------------------------------
+
+_info1_
+local GREEN=$'\e[0;32m'
+local PURPLE=$'\e[0;35m'
+local NC=$'\e[0m' # reset color
+
+printf '\n%s\n' ' Enter '${PURPLE}'m'${NC}' to retry, '${PURPLE}'i'${NC}' for more information, any other key to quit: '${GREEN} && read -r _input && echo -e ${NC}
+
+     _input=$(echo "$_input" | tr '[:upper:]' '[:lower:]')
      case $_input in
         m) temp_conv ;;
+        i) absolute_zero ;;
         *) return ;;
      esac
 }
 
 absolute_zero() {
-cat <<_info_
+cat <<_info2_
 
 -------------------------------------------------------------------------------
 
@@ -90,8 +130,8 @@ cat <<_info_
 
   Consequently, the entropy can never be really zero.
 
-   lim  ΔS = 0
-   T⟶ 0
+     lim ΔS = 0
+     T ⟶ 0
 
   That is, for a temperature close to absolute zero the entropy limit runs to
   zero.
@@ -102,8 +142,14 @@ cat <<_info_
 
 -------------------------------------------------------------------------------
 
-_info_
-echo -en "\n\n Enter \e[0;32mm\e[0m to return to menu,\n       \e[0;32mi\e[0m \e[0m for even more information\n       or any other key to quit:\e[32m " && read -r _input && echo -en "\e[0m"
+_info2_
+local GREEN=$'\e[0;32m'
+local PURPLE=$'\e[0;35m'
+local NC=$'\e[0m' # reset color
+
+printf '%s\n\n' ' Enter '${PURPLE}'m'${NC}' to retry, '${PURPLE}'i'${NC}' for more information, any other key to quit: '${GREEN} && read -r _input && echo -en ${NC}
+
+     _input=$(echo "$_input" | tr '[:upper:]' '[:lower:]')
      case $_input in
         m) temp_conv ;;
         i) kelvin_info ;;
@@ -111,78 +157,117 @@ echo -en "\n\n Enter \e[0;32mm\e[0m to return to menu,\n       \e[0;32mi\e[0m \e
      esac
 }
 
-c2f() {
-  echo ""
-  echo -en " Please enter a value for \e[0;35mCelsius\e[0m: \e[0;36m" && read -r valc && echo -en "\e[0m"
-  if [[ $valc =~ ^[+-]?[0-9]+\,?[0-9]?*$ ]] ; then valc=${valc/,/.} ;fi
-  if [ "$(echo -e "$valc -273.15" | awk '{print ( $1 < $2 )}')" = 1 ] ; then echo -en "\n Values lower than \e[0;31m-273.15\e[0m for Celsius are not permissible, since -273.15°C equals 0 Kelvin, and according to the laws of thermodynamics 0 Kelvin is the lowest possible temperature.\n\n Press \e[0;32mr\e[0m to retry,\n       \e[0;32mi\e[0m for some nerdy information,\n       or any other key to quit: \e[32m" && read -r _input && echo -en "\e[0m"
+Celsius2Fahrenheit() {
+local UNIT='°C'
+local LOWEST='-273.15'
+local RED=$'\e[0;31m'
+local REDBOLD=$'\e[1;31m'
+local GREEN=$'\e[0;32m'
+local ORANGE=$'\e[0;33m'
+local PURPLE=$'\e[0;35m'
+local CYAN=$'\e[0;36m'
+local NC=$'\e[0m' # reset color
+
+  printf '\n'
+  printf '%s' ' Please enter a value for '${PURPLE}'Celsius'${NC}': ' ${CYAN} && read -r VALUE_CELSIUS && echo -en ${NC}
+  if [[ $VALUE_CELSIUS =~ ^[+-]?[0-9]+\,?[0-9]?*$ ]] ; then VALUE_CELSIUS=${VALUE_CELSIUS/,/.} ;fi
+  if [ "$(echo -e "$VALUE_CELSIUS $LOWEST" | awk '{print ( $1 < $2 )}')" = 1 ] ; then printf '\n%s' ' Values lower than '${REDBOLD}''${LOWEST}''${UNIT}''${NC}' are not permissible, since '${LOWEST}''${UNIT}' equals 0 Kelvin, and according to the laws of thermodynamics 0 Kelvin is the lowest possible temperature.'
+  printf '\n%s' ' Enter '${PURPLE}'r'${NC}' to retry, '${PURPLE}'m'${NC}' for menu, any other key to quit: '${GREEN} && read -r _input && echo -en ${NC}
+     _input=$(echo "$_input" | tr '[:upper:]' '[:lower:]')
      case $_input in
-        r) c2f ;;
+        r) Celsius2Fahrenheit ;;
         m) temp_conv ;;
         i) absolute_zero ;;
         *) return ;;
      esac
-  elif [[ $valc =~ ^[+-]?[0-9]+\.?[0-9]?*$ ]] ; then
-  FAHRENHEIT=$(echo -en $valc | awk '{print ( '$valc' * '$fac' ) + '$summ'}')
-  KELVIN="$(echo -en $valc | awk '{print ( '$valc' + '$CELSIUS2KELVIN' )}')"
+  elif [[ $VALUE_CELSIUS =~ ^[+-]?[0-9]+\.?[0-9]?*$ ]] ; then
+  FAHRENHEIT=$(echo -en $VALUE_CELSIUS | awk '{print ( '$VALUE_CELSIUS' * '$FAHRENHEIT_FACTOR' ) + '$summ'}')
+  KELVIN="$(echo -en $VALUE_CELSIUS | awk '{print ( '$VALUE_CELSIUS' + '$CELSIUS2KELVIN' )}')"
   eV="$(echo -en $KELVIN | awk '{print ( '$KELVIN' * '$KELVIN2eV' )}')"
   JOULES="$(echo -en $KELVIN | awk '{print ( '$KELVIN' * '$KELVIN2JOULES' )}')"
-  echo -en "\n The conversion formula is \e[1;33m($valc°C × $fac) + $summ\e[0m and gives \e[0;32m$FAHRENHEIT°F\e[0m, which is \e[0;32m$KELVIN Kelvin\e[0m, \e[0;32m$JOULES Joules\e[0m and \e[0;32m$eV eV\e[0m.\n\n" && valc="" && return
-  else echo -en "\n\e[0;31m No valid input!\e[0m\n Enter \e[1;32mr\e[0m to retry, any other key to quit: \e[0;32m" && read -r _input && echo -en "\e[0m"
+  printf '\n%s\n' ' The conversion formula is '${ORANGE}'('${VALUE_CELSIUS}'°C × '${FAHRENHEIT_FACTOR}') + '${summ}''${NC}' and gives '$GREEN''${FAHRENHEIT}'°F'${NC}', which is '${GREEN}''${KELVIN}' Kelvin'${NC}', '${GREEN}''${JOULES}' Joules'${NC}' and '${GREEN}''${eV}' eV'${NC}'.' && VALUE_FAHRENHEIT="" && return
+  else printf '\n%s%s' ${RED}' No valid input!'${NC}' Enter '${PURPLE}'r'${NC}' to retry, '${PURPLE}'m'${NC}' for menu, any other key to quit: '${GREEN} && read -r _input && echo -en ${NC}
+     _input=$(echo "$_input" | tr '[:upper:]' '[:lower:]')
      case $_input in
-        r) c2f ;;
+        r) Celsius2Fahrenheit ;;
         m) temp_conv ;;
         *) return ;;
      esac
   fi
 }
 
-f2c() {
-  echo ""
-  echo -en " Please enter a value for \e[0;35mFahrenheit\e[0m: \e[0;36m" && read -r valf && echo -en "\e[0m"
-  if [[ $valf =~ ^[+-]?[0-9]+\,?[0-9]?*$ ]] ; then valf=${valf/,/.} ;fi
-  if [ "$(echo -e "$valf -459.67" | awk '{print ( $1 < $2 )}')" = 1 ] ; then echo -en "\n Values lower than \e[0;31m-459.67\e[0m for Fahrenheit are not permissible, since -459.67 equals 0 Kelvin, and according to the laws of thermodynamics 0 Kelvin is the lowest possible temperature.\n\n Press \e[0;32mr\e[0m to retry,\n       \e[0;32mi\e[0m for some nerdy information,\n       or any other key to quit: \e[35m" && read -r _input && echo -en "\e[0m"
+Fahrenheit2Celsius() {
+local UNIT='°F'
+local LOWEST=$'-459.67'
+local RED=$'\e[0;31m'
+local REDBOLD=$'\e[1;31m'
+local GREEN=$'\e[0;32m'
+local ORANGE=$'\e[0;33m'
+local PURPLE=$'\e[0;35m'
+local CYAN=$'\e[0;36m'
+local NC=$'\e[0m' # reset color
+
+  printf '\n'
+  printf '%s' ' Please enter a value for '${PURPLE}'Fahrenheit'${NC}': ' ${CYAN} && read -r VALUE_FAHRENHEIT && echo -en ${NC}
+  if [[ $VALUE_FAHRENHEIT =~ ^[+-]?[0-9]+\,?[0-9]*$ ]] ; then VALUE_FAHRENHEIT=${VALUE_FAHRENHEIT/,/.} ;fi
+  if [ "$(echo -e "$VALUE_FAHRENHEIT $LOWEST" | awk '{print ( $1 < $2 )}')" = 1 ] ; then printf '\n%s' ' Values lower than '${REDBOLD}''${LOWEST}''${UNIT}''${NC}' are not permissible, since '${LOWEST}''${UNIT}' equals 0 Kelvin, and according to the laws of thermodynamics 0 Kelvin is the lowest possible temperature.'
+  printf '\n%s' ' Enter '${PURPLE}'r'${NC}' to retry, '${PURPLE}'m'${NC}' for menu, any other key to quit: '${GREEN} && read -r _input && echo -en ${NC}
+     _input=$(echo "$_input" | tr '[:upper:]' '[:lower:]')
      case $_input in
-        r) f2c ;;
+        r) Fahrenheit2Celsius ;;
         m) temp_conv ;;
         i) absolute_zero ;;
         *) return ;;
      esac
-  elif [[ $valf =~ ^[+-]?[0-9]+\.?[0-9]?*$ ]] ; then
-  CELSIUS="$(echo -en $valf | awk '{ print ( '$valf' - '$summ' ) * '$caf' }')"
+  elif [[ $VALUE_FAHRENHEIT =~ ^[+-]?[0-9]+\.?[0-9]?*$ ]] ; then
+  CELSIUS="$(echo -en $VALUE_FAHRENHEIT | awk '{ print ( '$VALUE_FAHRENHEIT' - '$summ' ) * '$FAHRENHEIT_ROTCAF' }')"
   KELVIN="$(echo -en $CELSIUS | awk '{print ( '$CELSIUS' + '$CELSIUS2KELVIN' )}')"
   eV="$(echo -en $KELVIN | awk '{print ( '$KELVIN' * '$KELVIN2eV' )}')"
   JOULES="$(echo -en $KELVIN | awk '{print ( '$KELVIN' * '$KELVIN2JOULES' )}')"
-  echo -e "\n The conversion formula is \e[1;33m($valf°F − $summ) × $caf\e[0m and gives \e[0;32m$CELSIUS°C\e[0m, which is \e[0;32m$KELVIN Kelvin\e[0m, \e[0;32m$JOULES Joules\e[0m and \e[0;32m$eV eV\e[0m.\n\n" && valf="" && return
-  else echo -en "\n\e[0;31m No valid input!\e[0m\n Enter \e[0;32mr\e[0m to retry, any other key to quit: \e[0;32m" && read -r _input && echo -en "\e[0m"
+  printf '\n%s\n' ' The conversion formula is '${ORANGE}'('${VALUE_FAHRENHEIT}'°F − '${summ}') × '${FAHRENHEIT_ROTCAF}''${NC}' and gives '${GREEN}''${CELSIUS}'°C'${NC}', which is '${GREEN}''${KELVIN}' Kelvin'${NC}', '${GREEN}''${JOULES}' Joules'${NC}' and '${GREEN}''${eV}' eV'${NC}'.' && VALUE_FAHRENHEIT="" && return
+  else printf '\n%s\n%s\n%s' ${RED}' No valid input!'${NC} ' Press'${PURPLE}' r'${NC}' to retry,'${PURPLE}' i'${NC}' for more information,' ' or any other key to quit: '${GREEN} && read -r _input && echo -en ${NC}
+     _input=$(echo "$_input" | tr '[:upper:]' '[:lower:]')
      case $_input in
-        r) f2c ;;
+        r) Fahrenheit2Celsius ;;
         m) temp_conv ;;
         *) return ;;
      esac
   fi
 }
 
-k2c() {
+Kelvin2Celsius() {
+local UNIT='Kelvin'
+local LOWEST=$'0'
+local RED=$'\e[0;31m'
+local REDBOLD=$'\e[1;31m'
+local GREEN=$'\e[0;32m'
+local ORANGE=$'\e[0;33m'
+local PURPLE=$'\e[0;35m'
+local CYAN=$'\e[0;36m'
+local NC=$'\e[0m' # reset color
+
   echo ""
-  echo -en " Please enter a value for \e[0;35mKelvin\e[0m: \e[0;36m" && read -r valkc && echo -en "\e[0m"
-  if [[ $valkc =~ ^[+-]?[0-9]+\,?[0-9]?*$ ]] ; then valkc=${valkc/,/.} ;fi
-  if [[ $valkc =~ ^[-][0-9]+\.?[0-9]?*$ ]] ; then echo -en "\n\n \e[0;31mNegative values\e[0m for Kelvin are not permissible, since according to the laws of thermodynamics 0 Kelvin is the lowest possible temperature.\n\n Press \e[0;32mr\e[0m to retry,\n       \e[0;32mi\e[0m for some nerdy information,\n       or any other key to quit: \e[32m" && read -r _input && echo -en "\e[0m"
+  printf '%s' ' Please enter a value for '${PURPLE}'Kelvin'${NC}': ' ${CYAN} && read -r value_kelvin && echo -en ${NC}
+  if [[ $value_kelvin =~ ^[+-]?[0-9]+\,?[0-9]*$ ]] ; then value_kelvin=${value_kelvin/,/.} ;fi
+  if [[ $value_kelvin =~ ^[-][0-9]+\.?[0-9]*$ ]] ; then
+  printf '\n\n%s' ' Values lower than '${REDBOLD}''${LOWEST}''${UNIT}''${NC}' are not permissible, since according to the laws of thermodynamics 0 Kelvin is the lowest possible temperature.'
+  printf '\n\n%s%s%s' '  Press '${PURPLE}'m'${NC}' to retry, '${PURPLE}'i'${NC}' for more information, or any other key to quit: '${GREEN} && read -r _input && echo -en ${NC}
+     _input=$(echo "$_input" | tr '[:upper:]' '[:lower:]')
      case $_input in
-        r) k2c ;;
         m) temp_conv ;;
         i) absolute_zero ;;
         *) return ;;
      esac
-  elif [[ $valkc =~ ^[+]?[0-9]+\.?[0-9]?*$ ]]; then
-  CELSIUS="$(echo -en $valkc | awk '{ print ( '$valkc' - '$CELSIUS2KELVIN' ) }')"
-  FAHRENHEIT="$(echo -en $CELSIUS | awk '{print (( '$CELSIUS' * '$fac' ) + '$summ' ) }')"
-  eV="$(echo -en $valkc | awk '{print ( '$valkc' * '$KELVIN2eV' )}')"
-  JOULES="$(echo -en $valkc | awk '{print ( '$valkc' * '$KELVIN2JOULES' )}')"
-  echo -e "\n The conversion formula is \e[1;33m$valkc K − $CELSIUS2KELVIN\e[0m and gives \e[0;32m$CELSIUS°C\e[0m, which is \e[0;32m$FAHRENHEIT°F\e[0m, \e[0;32m$JOULES Joules\e[0m and \e[0;32m$eV eV\e[0m.\n\n" && valkc="" && return
-  else echo -en "\n\e[0;31m No valid input!\e[0m\n Enter \e[0;32mr\e[0m to retry, any other key to quit: \e[0;32m" && read -r _input && echo -en "\e[0m"
+  elif [[ $value_kelvin =~ ^[+]?[0-9]+\.?[0-9]?*$ ]]; then
+  CELSIUS="$(echo -en $value_kelvin | awk '{ print ( '$value_kelvin' - '$CELSIUS2KELVIN' ) }')"
+  FAHRENHEIT="$(echo -en $CELSIUS | awk '{print (( '$CELSIUS' * '$FAHRENHEIT_FACTOR' ) + '$summ' ) }')"
+  eV="$(echo -en $value_kelvin | awk '{print ( '$value_kelvin' * '$KELVIN2eV' )}')"
+  JOULES="$(echo -en $value_kelvin | awk '{print ( '$value_kelvin' * '$KELVIN2JOULES' )}')"
+  printf '\n%s\n' ' The conversion formula is '${ORANGE}''${value_kelvin}' K − '${CELSIUS2KELVIN}''${NC}' and gives '${GREEN}''$CELSIUS'°C'${NC}', which is '${GREEN}''$FAHRENHEIT'°F'${NC}', '${GREEN}''${JOULES}' Joules'${NC}' and '${GREEN}''${eV}' eV'${NC}'.' && value_kelvin="" && return
+  else printf '\n%s\n%s\n%s' ${RED}' No valid input!'${NC} ' Press'${PURPLE}' r'${NC}' to retry,'${PURPLE}' i'${NC}' for more information,' ' or any other key to quit: '${GREEN} && read -r _input && echo -en ${NC}
+     _input=$(echo "$_input" | tr '[:upper:]' '[:lower:]')
      case $_input in
-        r) k2c ;;
+        r) Kelvin2Celsius ;;
         m) temp_conv ;;
         *) return ;;
      esac
@@ -190,13 +275,24 @@ k2c() {
 }
 
 temp_conv() {
-  echo -en "\n Enter \e[0;36mCF\e[0m for \e[0;36mCelsius\e[0;32m -> Fahrenheit -> Kelvin -> Joule -> Electron Volt\e[0m conversion\n       \e[0;36mFC\e[0m for \e[0;36mFahrenheit\e[0;32m -> Celsius -> Kelvin -> Joule -> Electron Volt\e[0m conversion\n       \e[0;36mKC\e[0m for \e[0;36mKelvin\e[0;32m -> Celsius -> Fahrenheit -> Joule -> Electron Volt\e[0m conversion\n\n  (case insensitive): \e[0;36m" && read -r _value && echo -en "\e[0m"
+local GREEN=$'\e[0;32m'
+local PURPLE=$'\e[0;35m'
+local CYAN=$'\e[0;36m'
+local NC=$'\e[0m' # reset color
+
+  printf '\n%s\n' 'Enter'
+  printf '%s\n'${PURPLE}'    C'${NC}' for '${CYAN}'Celsius (°C)    '${NC}'-> '${GREEN}'Fahrenheit (°F) '${NC}'->'${GREEN}' Kelvin (K)      '${NC}'->'${GREEN}' Joule (J) '${NC}'->'${GREEN}' Electron Volt (eV)'${NC}' conversion'
+  printf '%s\n'${PURPLE}'    F'${NC}' for '${CYAN}'Fahrenheit (°F) '${NC}'->'${GREEN}' Celsius (°C)    '${NC}'->'${GREEN}' Kelvin (K)      '${NC}'->'${GREEN}' Joule (J) '${NC}'->'${GREEN}' Electron Volt (eV)'${NC}' conversion'
+  printf '%s\n'${PURPLE}'    K'${NC}' for '${CYAN}'Kelvin (K)      '${NC}'->'${GREEN}' Celsius (°C)    '${NC}'->'${GREEN}' Fahrenheit (°F) '${NC}'->'${GREEN}' Joule (J) '${NC}'->'${GREEN}' Electron Volt (eV)'${NC}' conversion'
+  printf '\n%s\n'${CYAN}'    any other key to abort'${NC}
+  printf '\n\n%s'  '(case insensitive): '${GREEN} && read -r _value && printf '%s' "${NC}"
+  _value=$(echo "$_value" | tr '[:upper:]' '[:lower:]')
      case "$_value" in
-        [C][F]|[c][f]) c2f ;;
-        [F][C]|[f][c]) f2c ;;
-        [K][C]|[k][c]) k2c ;;
-                    *) echo -e "\n  \e[0;31m   Abort!\e[0m\n" && return ;;
+        c) Celsius2Fahrenheit ;;
+        f) Fahrenheit2Celsius ;;
+        k) Kelvin2Celsius ;;
+        *) printf '\n\t%s\n' "${RED}Abort!${NC}" && return ;;
      esac
 }
 
-temp_conv $"@"
+temp_conv "$@"
