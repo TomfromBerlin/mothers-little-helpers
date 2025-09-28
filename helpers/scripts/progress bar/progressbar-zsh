@@ -1,14 +1,13 @@
 #!/usr/bin/env zsh
+# If you work with Bash just change the shebang to !/usr/bin/env bash. Then it should work.
 # set -x
 BATCHSIZE=500
 # ---------------------------------------------
 # Pac‑Man‑Style Progress Bar
 # ---------------------------------------------
-# set -u
-# unset x
 
 has_colors() {
-  if (( $+HAS_COLORS )); then
+  if [[ -n ${HAS_COLORS+x} ]]; then
     :
   else
     case $TERM in
@@ -20,7 +19,7 @@ has_colors() {
           freebsd*|dragonfly*) colors=$(tput Co) ;;
           *) colors=$(tput colors) ;;
         esac
-        typeset -g HAS_COLORS=$(( colors >= 8 ))
+        declare -g HAS_COLORS=1
         ;;
     esac
   fi
