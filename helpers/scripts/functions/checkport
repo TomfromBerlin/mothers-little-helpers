@@ -22,6 +22,7 @@
 # IN THE SOFTWARE.                                                             #
 #                                                                              #
 ################################################################################
+#                                                                              #
 # Funktion: checkport                                                          #
 # Benutzung: checkport an der Eingabeaufforderung, optional kann ein Port      #
 # angegeben werden                                                             #
@@ -31,9 +32,9 @@
 # Einträge gezeigt.                                                            #
 # Eingabe am Prompt: checkport [Portnummer]                                    #
 # Mit Hilfe von ChatGPT (OpenAI) erstellt (https://openai.com/chatgpt)         #
+#                                                                              #
 ################################################################################
-# unterstützt durch ChatGPT (OpenAI) (https://openai.com/chatgpt)              #
-################################################################################
+#                                                                              #
 # Function: checkport                                                          #
 # Description: Shows which processes are listening on which TCP ports or       #
 # communicate.                                                                 #
@@ -41,6 +42,7 @@
 # shown.                                                                       #
 # Enter at the prompt: checkport [port number]                                 #
 # Created with the help of ChatGPT (OpenAI) (https://openai.com/chatgpt)       #
+#                                                                              #
 ################################################################################
 
 is_german() {
@@ -56,6 +58,7 @@ if [[ ! -x "$(command -v lsof)" ]]; then
     fi
     return 1
 fi
+
 checkport() {
 # Funktion zum Prüfen, ob die Sprache Deutsch ist
 # Function to check whether the language is German
@@ -102,10 +105,8 @@ else
     echo -e "\e[0;36m"
     query=$(lsof -nP -iTCP -sTCP:LISTEN,ESTABLISHED 2>/dev/null)
 fi
+
 # Ausgabe/Output
-
-
-# Titelzeile
 # Tabellenüberschriften/Table Header
 printf "+%-14s-+-%-6s-+-%-8s-+-%-10s---%-11s-+-%-14s+\n" \
 "--------------" "------" "--------" "----------" "-----------" "--------------"
