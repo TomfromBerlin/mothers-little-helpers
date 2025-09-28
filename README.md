@@ -29,14 +29,14 @@ More information and how to use shell functions can be found [here](https://zsh.
 - [temp_conv](helpers/scripts/functions/temp_conv) - Script to convert temperature values (Celsius, Fahrenheit, Kelvin). The output includes joules and electron volts. You will be asked to enter the value you want to convert and will receive all conversions as a result.
 
 <details><summary>Details for temp_conv</summary>
-  You will be prompted for nessecary input and the output is colored. If you want to have background information type `absolute_zero` at the command line and press enter (you must not run the script for this function).
+  You will be prompted for nessecary input and the output is colored. If you want to have background information type `absolute_zero` at the command line and press enter (you don't have to run the script for this function, but it is available while using the converter).
   For conversion type `temp_conv` at the command line, press Enter and use one of the following options (case insensitive):
 
 | Command | Option | Purpose |
 |:---------:|:---------:|:---------:|
-| `temp_conv` | `CF` | for Celsius -> Fahrenheit -> Kelvin -> Joule -> Electron Volt conversion |
-| `temp_conv` | `FC` | for Fahrenheit -> Celsius -> Kelvin -> Joule -> Electron Volt conversion |
-| `temp_conv` | `KC` | for Kelvin -> Celsius -> Fahrenheit -> Joule -> Electron Volt conversion |
+| `temp_conv` | `C` | for Celsius -> Fahrenheit -> Kelvin -> Joule -> Electron Volt conversion |
+| `temp_conv` | `F` | for Fahrenheit -> Celsius -> Kelvin -> Joule -> Electron Volt conversion |
+| `temp_conv` | `K` | for Kelvin -> Celsius -> Fahrenheit -> Joule -> Electron Volt conversion |
 | `absolute_zero` |  | further information about the Third Law of Thermodynamics and more... |
 
  For example, if you have a temperature in Fahrenheit and want to convert it to Kelvin, you need to run the script and enter "fc" when prompted and press `Enter`. The following prompt looks like this:
