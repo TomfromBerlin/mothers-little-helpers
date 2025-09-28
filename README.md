@@ -24,7 +24,7 @@ Copy the desired files into a dedicated directory where zsh can find it (e.g. `~
 More information and how to use shell functions can be found [here](https://zsh.sourceforge.io/Doc/Release/Functions.html).
 
 - [allcolors](helpers/scripts/functions/allcolors) - shows the escape sequences for allmost all colors in the terminal
-- [colornames](helpers/scripts/functions/colornames) - shows the escape sequences for some colors in the terminal
+- [colornames](helpers/scripts/functions/colornames) - shows the escape sequences and names for some colors in the terminal
 - [chpwd](helpers/scripts/functions/chpwd) - auto-ls after each directory change (zsh only)
 - [temp_conv](helpers/scripts/functions/temp_conv) - Script to convert temperature values (Celsius, Fahrenheit, Kelvin). The output includes joules and electron volts. You will be asked to enter the value you want to convert and will receive all conversions as a result.
 
