@@ -51,7 +51,6 @@ Enter a value (e.g. `100`) and receive the output presenting the results. It loo
 
 - [title](helpers/scripts/funtions/title) - show command in window title bar (zsh only)
 - [topcmd](helpers/scripts/functions/topcmd) - display frequently used commands of the current shell session or the entire command history.
-- [zprofiler](helpers/scripts/zprofiler) - profiling of the Z shell with instructions for configuration, if necessary
 - [checkport](helpers/scripts/functions/checkport) - Tiny function for zsh that shows which processes are listening or communicating on which TCP ports. It determines whether the system language is German. If this is the case, the output is in German, otherwise in English.
 - ~[zsh_wifi_signal](helpers/scripts/functions/zsh_wifi_signal) - shows wifi signal strength in a terminal (zsh only)~
 
@@ -59,6 +58,7 @@ Enter a value (e.g. `100`) and receive the output presenting the results. It loo
 
 - [zramswap](helpers/scripts/zramswap) - install a compressed swapfile in RAM
 - [shlt](helpers/scripts/shlt) - measure loading time of the shell
+- [zprofiler](helpers/scripts/zprofiler) - profiling of the Z shell with instructions for configuration, if necessary
 - [zrecompile](helpers/scripts/misc/zrecompile) - compile functions and dot-files, if necessary (zsh only)
 - [PS4-demo](helpers/scripts/misc/PS4_demo.sh) - demonstrate the functionality of the PS4 prompt variable
 - [what_shell](helpers/scripts/misc/what_shell) - show the (sub-)shell that is currently used. usage: `source what_shell` (the file should live somewhere in your $PATH)
