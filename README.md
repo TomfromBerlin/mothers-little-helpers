@@ -17,7 +17,7 @@ Copy the desired files into a dedicated directory where zsh can find it (e.g. `~
 ## Tips & Tricks
 
 - [How to make Debian 11 (bullseye) & unbound work together](/../../../../TomfromBerlin/Debian-Pihole-Unbound)
-- [How to fix incorrect scaling of KDE Plasma when using a nvidia card with propietary dirvers](helpers/kde-nvidia)
+- [How to fix incorrect scaling of KDE Plasma when using a nvidia card with propietary drivers](helpers/kde-nvidia)
 
 ## Functions
 
