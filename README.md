@@ -39,7 +39,7 @@ More information and how to use shell functions can be found [here](https://zsh.
 | `temp_conv` | `K` | for Kelvin -> Celsius -> Fahrenheit -> Joule -> Electron Volt conversion |
 | `absolute_zero` |  | further information about the Third Law of Thermodynamics and more... |
 
- For example, if you have a temperature in Fahrenheit and want to convert it to Kelvin, you need to run the script and enter "fc" when prompted and press `Enter`. The following prompt looks like this:
+ For example, if you have a temperature in Fahrenheit and want to convert it to Kelvin, you need to run the script and enter "f" (or "F", it doesn't matter) when prompted and press `Enter`. The following prompt looks like this:
 
 `Please enter a value for Fahrenheit:`
 
@@ -62,7 +62,7 @@ Enter a value (e.g. `100`) and receive the output presenting the results. It loo
 - [zrecompile](helpers/scripts/misc/zrecompile) - compile functions and dot-files, if necessary (zsh only)
 - [PS4-demo](helpers/scripts/misc/PS4_demo.sh) - demonstrate the functionality of the PS4 prompt variable
 - [what_shell](helpers/scripts/misc/what_shell) - show the (sub-)shell that is currently used. usage: `source what_shell` (the file should live somewhere in your $PATH)
-- [progress bar](https://github.com/TomfromBerlin/mothers-little-helpers/tree/main/helpers/scripts/progress%20bar) - a progress bar purely written as a shell script
+- [progress bar](helpers/scripts/progress%20bar) - a progress bar purely written as a shell script
 
 ## Information tools for command line
 
