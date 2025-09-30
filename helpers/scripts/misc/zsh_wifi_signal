@@ -1,0 +1,35 @@
+#!/usr/bin/env zsh
+################################################################################
+#            Everything below this line comes no warranty of any kind.         #
+#                    Use these file at your own risk!                          #
+################################################################################
+#
+zsh_wifi_signal(){
+    emulate -L zsh
+    local red=$'\e[1;31m'
+    local green=$'\e[1;32m'
+    local yellow=$'\e[1;33m'
+    local wifi_symbol=$'\uf1eb' # 󰖩
+    local NC=$'\e[0m'
+
+    # Check whether wlan0 is connected
+    local connected
+    connected=$(nmcli -t -f DEVICE,STATE d | awk -F: '$1=="wlan0"{print $2}')
+
+    if [[ $connected == "connected" ]]; then
+        local signal
+        signal=$(iwconfig wlan0 2>/dev/null | sed -nE 's/.*level=(-?[0-9]+).*/\1/p')
+        local color=$yellow
+        if (( signal > -50 )); then
+            color=$green
+        elif (( signal > -70 )); then
+            color=$yellow
+        else
+            color=$red
+        fi
+        printf '%s %s dBm' "$color$wifi_symbol" "$signal"
+    else
+        printf '%s\n' "$red" "No neutrino emission detected!" "$NC"
+    fi
+}
+
