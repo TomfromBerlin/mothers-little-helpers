@@ -19,7 +19,6 @@ _cnf_core() {
       IFS=$'\t' read -r pkgpath binpath < <(pkgfile -b -v -- "$cmd" 2>/dev/null)
       if [[ -n "$pkgs" ]]; then
         printf '%s\n' "The command ""${YELLOW}${cmd}${NC}"" is not installed."
-        # printf '%s%s%s%s%s\n' "${YELLOW}${cmd}" "${NC}"" is found in " "${GREEN}${pkgpath}${NC}" " and will be installed in " "${GREEN}${binpath}${NC}"
         printf '%s%s%s%s%s\n' \
               "${YELLOW}${cmd}" "${NC} is found in " \
               "${GREEN}${pkgpath}${NC}" " and will be installed in " \
