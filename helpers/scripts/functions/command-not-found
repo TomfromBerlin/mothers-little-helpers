@@ -1,0 +1,90 @@
+# Warning:
+# This script works perfectly on my machine.
+# If it works on yours, that's your problem.
+# common logic
+_cnf_core() {
+  local cmd="$1"
+  local RED=$'\e[31;40m'
+  local GREEN=$'\e[32;40m'
+  local YELLOW=$'\e[33;40m'
+  local BLUE=$'\e[34m'
+  local NC=$'\e[0m'
+
+  # Arch based Distros → pacman + pkgfile
+  if command -v pacman >/dev/null 2>&1; then
+    if command -v pkgfile >/dev/null 2>&1; then
+      local pkgs
+      pkgs=$(pkgfile -b -v -- "$cmd" 2>/dev/null)
+#       local binpath
+#       binpath=$(pkgfile -b -v -- "$cmd" 2>/dev/null | sed -n '1p')
+#       local pkgpath
+#       pkgpath=$(pkgfile -b -v -- "$cmd" 2>/dev/null | sed -n '2p')
+      local pkgpath binpath
+      IFS=$'\t' read -r pkgpath binpath < <(pkgfile -b -v -- "$cmd" 2>/dev/null)
+      if [[ -n "$pkgs" ]]; then
+        printf '%s\n' "The command ""${YELLOW}${cmd}${NC}"" is not installed."
+        # printf '%s%s%s%s%s\n' "${YELLOW}${cmd}" "${NC}"" is found in " "${GREEN}${pkgpath}${NC}" " and will be installed in " "${GREEN}${binpath}${NC}"
+        printf '%s%s%s%s%s\n' \
+              "${YELLOW}${cmd}" "${NC} is found in " \
+              "${GREEN}${pkgpath}${NC}" " and will be installed in " \
+              "${GREEN}${binpath}${NC}"
+
+        if read -rq "choice? Install it now? (y/N) "; then
+          echo
+          sudo pacman -S --noconfirm --color auto "$pkgs"
+          return $?
+        else
+          echo
+        fi
+      else
+        printf '%s'"${RED}zsh/bash: command not found: " "$cmd" >&2 "${NC}"
+      fi
+    else
+      printf '%s' "${BLUE}pkgfile ${RED}not installed.""${NC}" " Try: sudo pacman -S pkgfile" >&2
+    fi
+    return 127
+  fi
+
+  # Debian/Ubuntu → apt + command-not-found
+  if command -v apt >/dev/null 2>&1; then
+    if [[ -x /usr/lib/command-not-found ]]; then
+      /usr/lib/command-not-found -- "$cmd"
+      return $?
+    else
+      printf '%s\n' "The command ""${YELLOW}${cmd}${NC}"" is not installed." "$cmd" >&2
+      if read -rq "choice? Install it now? (y/N) "; then
+      echo
+      sudo apt-get install -y "$pkgs"
+      return $?
+      else
+      printf '%s\n' "Tip: sudo apt install" "$pkgs" >&2
+      fi
+    fi
+    return 127
+  fi
+
+  # Fallback (unbekannte Distro)
+  printf 'command not found: %s\n' "$cmd" >&2
+  return 127
+}
+
+# Zsh Hook
+if [ -n "$ZSH_NAME" ]; then
+  command_not_found_handler() {
+    _cnf_core "$@"
+  }
+fi
+
+# Bash Hook
+if [ -n "$BASH" ]; then
+  command_not_found_handle() {
+    _cnf_core "$@"
+  }
+fi
+
+# Fish Hook (nur wenn Fish läuft)
+if [ -n "$FISH_VERSION" ]; then
+fish_command_not_found
+    _cnf_core "$argv"
+  end
+fi
