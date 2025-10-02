@@ -4,6 +4,9 @@
 
 This repository is provided to you in the hope that it will be helpful, but everything comes without any warranty and the owner of this repository is in no way responsible for any kind of harm, even if your cat dies while using one or more or all of these files.
 
+Note to self:
+*People may clone it, tweak it, and never give a* ⭐ *But hey – at least my code gets to travel the world.*
+
 ## Licence
 
 Some of the scripts may have their own license, if not, the [MIT license](https://opensource.org/license/mit/) applies.
