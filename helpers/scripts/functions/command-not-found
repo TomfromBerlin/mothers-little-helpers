@@ -15,10 +15,6 @@ _cnf_core() {
     if command -v pkgfile >/dev/null 2>&1; then
       local pkgs
       pkgs=$(pkgfile -b -v -- "$cmd" 2>/dev/null)
-#       local binpath
-#       binpath=$(pkgfile -b -v -- "$cmd" 2>/dev/null | sed -n '1p')
-#       local pkgpath
-#       pkgpath=$(pkgfile -b -v -- "$cmd" 2>/dev/null | sed -n '2p')
       local pkgpath binpath
       IFS=$'\t' read -r pkgpath binpath < <(pkgfile -b -v -- "$cmd" 2>/dev/null)
       if [[ -n "$pkgs" ]]; then
