@@ -28,10 +28,9 @@ More information and how to use shell functions can be found [here](https://zsh.
 
 - [allcolors](helpers/scripts/functions/allcolors) - shows the escape sequences for allmost all colors in the terminal
 - [colornames](helpers/scripts/functions/colornames) - shows the escape sequences and names for some colors in the terminal
+- [command-not-found](helpers/scripts/functions/command-not-found) - 'command not found' script for zsh/bash/fish (can be used as a function)
 - [chpwd](helpers/scripts/functions/chpwd) - auto-ls after each directory change (zsh only)
 - [temp_conv](helpers/scripts/functions/temp_conv) - Script to convert temperature values (Celsius, Fahrenheit, Kelvin). The output includes joules and electron volts. You will be asked to enter the value you want to convert and will receive all conversions as a result.
-- [command-not-found](helpers/scripts/functions/command-not-found) - 'command not found' script for zsh/bash/fish (can be used as a function)
-
 <details><summary>Details for temp_conv</summary>
   You will be prompted for nessecary input and the output is colored. If you want to have background information type `absolute_zero` at the command line and press enter (you don't have to run the script for this function, but it is available while using the converter).
   For conversion type `temp_conv` at the command line, press Enter and use one of the following options (case insensitive):
