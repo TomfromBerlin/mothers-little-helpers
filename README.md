@@ -28,7 +28,7 @@ More information and how to use shell functions can be found [here](https://zsh.
 
 - [allcolors](helpers/scripts/functions/allcolors) - shows the escape sequences for allmost all colors in the terminal
 - [colornames](helpers/scripts/functions/colornames) - shows the escape sequences and names for some colors in the terminal
-- [command-not-found](helpers/scripts/functions/command-not-found) - 'command not found' script for zsh/bash/fish (can be used as a function)
+- [command-not-found](helpers/scripts/functions/command-not-found) - 'command not found' script for zsh/bash/~fish~ (should be used as a function). Due to the Fish syntax, a parser error occurs when the Fish hook is active. Therefore, it is commented out in the script.
 - [chpwd](helpers/scripts/functions/chpwd) - auto-ls after each directory change (zsh only)
 - [temp_conv](helpers/scripts/functions/temp_conv) - Script to convert temperature values (Celsius, Fahrenheit, Kelvin). The output includes joules and electron volts. You will be asked to enter the value you want to convert and will receive all conversions as a result.
 <details><summary>Details for temp_conv</summary>
