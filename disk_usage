@@ -1,0 +1,12 @@
+#!/bin/bash
+THRESHOLD=80
+
+df -h | grep '^/dev/' | while read -r line; do
+    USAGE=$(echo "$line" | awk '{print $5}' | sed 's/%//')
+    PART=$(echo "$line" | awk '{print $6}')
+
+    if [ "$USAGE" -ge "$THRESHOLD" ]; then
+        notify-send "Partition $PART is at ${USAGE}% on $(hostname)"
+#        zenity --info --text="Partition $PART is at ${USAGE}% on $(hostname)"
+    fi
+done
