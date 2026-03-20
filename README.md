@@ -66,8 +66,11 @@ Enter a value (e.g. `100`) and receive the output presenting the results. It loo
 - [PS4-demo](helpers/scripts/misc/PS4_demo.sh) - demonstrate the functionality of the PS4 prompt variable
 - [what_shell](helpers/scripts/misc/what_shell) - show the (sub-)shell that is currently used. usage: `source what_shell` (the file should live somewhere in your $PATH)
 - [progress bar](helpers/scripts/progress%20bar) - a progress bar purely written as a shell script
-
+<!--
+- [mem_monitor](helpers/scripts/mem_monitor) - live memory usage bar at the bottom of the terminal. Can be integrated into other scripts or called from them.
+-->
 ## Information tools for command line
 
 - [screenFetch](https://github.com/KittyKatt/screenFetch) - The Bash Screenshot Information Tool
-- [Neofetch](https://github.com/dylanaraps/neofetch) - command-line system information tool
+- [Neofetch](https://github.com/dylanaraps/neofetch) - command-line system information tool (unmaintained)
+- [fastfetch](https://github.com/fastfetch-cli/fastfetch) - actively maintained Neofetch alternative, significantly faster
