@@ -22,27 +22,14 @@
 # IN THE SOFTWARE.                                                             #
 #                                                                              #
 ################################################################################
-#                                                                              #
-# Funktion: checkport                                                          #
-# Benutzung: checkport an der Eingabeaufforderung, optional kann ein Port      #
-# angegeben werden                                                             #
-# Beschreibung: Zeigt an, welche Prozesse auf welchen TCP-Ports lauschen oder  #
-# kommunizieren.                                                               #
-# Optionaler Parameter: Portnummer – wenn angegeben, werden nur zugehörige     #
-# Einträge gezeigt.                                                            #
-# Eingabe am Prompt: checkport [Portnummer]                                    #
-# Mit Hilfe von ChatGPT (OpenAI) erstellt (https://openai.com/chatgpt)         #
-#                                                                              #
-################################################################################
-#                                                                              #
 # Function: checkport                                                          #
-# Description: Shows which processes are listening on which TCP ports or       #
-# communicate.                                                                 #
-# Optional parameter: Port number - if specified, only associated entries are  #
-# shown.                                                                       #
-# Enter at the prompt: checkport [port number]                                 #
-# Created with the help of ChatGPT (OpenAI) (https://openai.com/chatgpt)       #
-#                                                                              #
+# Usage: checkport at the command prompt, optionally a port                    #
+# can be specified                                                             #
+# Description: Shows which processes are listening on or communicating on      #
+# which TCP ports.                                                             #
+# Optional parameter: Port number – if specified, only corresponding           #
+# entries are shown.                                                           #
+# Input at the prompt: checkport [port number]                                 #
 ################################################################################
 
 is_german() {
@@ -58,7 +45,6 @@ if [[ ! -x "$(command -v lsof)" ]]; then
     fi
     return 1
 fi
-
 checkport() {
 # Funktion zum Prüfen, ob die Sprache Deutsch ist
 # Function to check whether the language is German
@@ -105,15 +91,17 @@ else
     echo -e "\e[0;36m"
     query=$(lsof -nP -iTCP -sTCP:LISTEN,ESTABLISHED 2>/dev/null)
 fi
-
 # Ausgabe/Output
+
+
+# Titelzeile
 # Tabellenüberschriften/Table Header
-printf "+%-14s-+-%-6s-+-%-8s-+-%-10s---%-11s-+-%-14s+\n" \
-"--------------" "------" "--------" "----------" "-----------" "--------------"
-printf "|%-14s | %-6s | %-8s | %-6s   %-15s | %-14s|\n" "$HEADER_Program" "" "" "" "$HEADER_PORT" ""
-printf "|%-14s | %-6s | %-8s | %-10s | %-11s | %-14s|\n" "$HEADER_COMMAND" "$HEADER_PID" "$HEADER_USER" "$HEADER_LOCAL" "$HEADER_REMOTE" "$HEADER_STATE"
-printf "|%-14s-+-%-6s-+-%-8s-+-%-10s-+-%-11s-+-%-14s|\n" \
-"--------------" "------" "--------" "----------" "-----------" "--------------"
+printf "╭%-14s─┬─%-6s─┬─%-8s─┬─%-10s───%-11s─┬─%-14s╮\n" \
+"──────────────" "──────" "────────" "──────────" "───────────" "──────────────"
+printf "│%-14s │ %-6s │ %-8s │ %-6s   %-15s │ %-14s│\n" "$HEADER_Program" "" "" "" "$HEADER_PORT" ""
+printf "│%-14s │ %-6s │ %-8s │ %-10s │ %-11s │ %-14s│\n" "$HEADER_COMMAND" "$HEADER_PID" "$HEADER_USER" "$HEADER_LOCAL" "$HEADER_REMOTE" "$HEADER_STATE"
+printf "│%-14s─┼─%-6s─┼─%-8s─┼─%-10s─┼─%-11s─┼─%-14s│\n" \
+"──────────────" "──────" "────────" "──────────" "───────────" "──────────────"
 
 echo "$query" | awk '
     /TCP/ {
@@ -132,10 +120,10 @@ echo "$query" | awk '
         local_port=name
     }
 
-    printf "|%-14s | %-6s | %-8s | %-10s | %-11s | %-14s|\n", cmd, pid, user, local_port, remote_port, state
+    printf "│%-14s │ %-6s │ %-8s │ %-10s │ %-11s │ %-14s│\n", cmd, pid, user, local_port, remote_port, state
     }'
-printf "+%-14s-+-%-6s-+-%-8s-+-%-10s-+-%-11s-+-%-14s+\n" \
-"--------------" "------" "--------" "----------" "-----------" "--------------"
+printf "╰%-14s─┴─%-6s─┴─%-8s─┴─%-10s─┴─%-11s─┴─%-14s╯\n" \
+"──────────────" "──────" "────────" "──────────" "───────────" "──────────────"
 echo -en "\e[0m"
 }
 checkport "$@"
