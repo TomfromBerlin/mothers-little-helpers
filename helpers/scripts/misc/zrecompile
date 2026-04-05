@@ -1,3 +1,5 @@
+#!/bin/env zsh
+############################################################################
 # This tries to find wordcode files and automatically re-compile them if
 # at least one of the original files is newer than the wordcode file.
 # This will only work if the original files were added with their full
@@ -29,7 +31,7 @@
 # Without the -t option, the return status is zero if all wordcode files
 # that needed re-compilation could be compiled and non-zero if compilation
 # for at least one of the files failed.
-
+############################################################################
 setopt localoptions extendedglob noshwordsplit noksharrays
 
 local opt check quiet zwc files re file pre ret map tmp mesg pats

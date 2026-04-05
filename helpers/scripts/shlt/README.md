@@ -1,6 +1,6 @@
 # shlt
 
-This script is intended to measure the load time of the active shell.
+This script is used to measure the loading time of the active shell.
 
 Usage: `shlt` or `shlt <integer>`
 
