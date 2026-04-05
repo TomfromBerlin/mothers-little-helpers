@@ -95,7 +95,7 @@ if [[ ! -x /usr/bin/zramctl ]]; then
 DEBIAN_FRONTEND=noninteractive
 # DEBIAN_FRONTEND is an apt-get variable, obviously it is for Debian-based environments.
 # https://www.cyberciti.biz/faq/explain-debian_frontend-apt-get-variable-for-ubuntu-debian/
-# no w we download the package, and install it, if it is not installed
+# now we download the package, and install it, if it is not installed
 sudo apt-get -yq install zram-tools < /dev/null > /dev/null
 # the switch [-yq] answers [y]es to apt-get and makes the output more or less [q]uiet;
 # [< /dev/null > /dev/null] redirects the remaining output (stdin, stdout) to nowhere, only errors will be shown
