@@ -3,33 +3,53 @@
 #            Everything below this line comes no warranty of any kind.         #
 #                    Use these file at your own risk!                          #
 ################################################################################
-#
+
 zsh_wifi_signal(){
     emulate -L zsh
-    local red=$'\e[1;31m'
+
     local green=$'\e[1;32m'
+    local red=$'\e[1;31m'
     local yellow=$'\e[1;33m'
-    local wifi_symbol=$'\uf1eb' # 󰖩
     local NC=$'\e[0m'
+
+    if [[ ! -x /bin/nmcli && ! -x /usr/bin/nmcli ]]; then
+    printf '%s\n%s\n' " ${yellow}nmcli${NC} ${red}not found.${NC}" " ${yellow}Exiting.${NC}"
+    unset green red yellow NC
+    return 1
+    fi
+
+    if [[ ! -f $HOME/.fonts/WIFI.ttf && ! -f $HOME/.config/fonts/WIFI.ttf && ! -f /usr/share/fonts/TTF/WIFI.ttf ]]; then
+    printf '\n%s\n%s\n%s\n' " Truetype Font WIFI.ttf not found." " Output will probably be scrambled." " Press [Y] to continue, any other key to abort."
+    read -sk choice
+    case $choice in
+        Y|y) :
+            ;;
+        *) return 1
+            ;;
+    esac
+    fi
 
     # Check whether wlan0 is connected
     local connected
-    connected=$(nmcli -t -f DEVICE,STATE d | awk -F: '$1=="wlan0"{print $2}')
+    connected=$(command nmcli -t -f DEVICE,STATE d | awk -F: '$1=="wlan0"{print $2}')
 
     if [[ $connected == "connected" ]]; then
-        local signal
+        local signal color no_wifi
+        no_wifi=$'\Uf05AA' # \Uf05AA is 󰖪
+        command nmcli -p d wifi show
         signal=$(iwconfig wlan0 2>/dev/null | sed -nE 's/.*level=(-?[0-9]+).*/\1/p')
-        local color=$yellow
         if (( signal > -50 )); then
-            color=$green
+            local wifi_symbol=$'\uf1eb' # \uf1eb is 
+            color=${green}
         elif (( signal > -70 )); then
-            color=$yellow
+            local wifi_symbol=$'\Uf05A9' # \Uf05A9 is 󰖩
+            color=${yellow}
         else
-            color=$red
+            local wifi_symbol=$'\Uf05A9' # \Uf05A9 is 󰖩
+            color=${red}
         fi
-        printf '%s %s dBm' "$color$wifi_symbol" "$signal"
+        printf ' %s %s dBm\n\n' "${color}${wifi_symbol}${NC}" "signal strength: ${color}${signal}${NC}"
     else
-        printf '%s\n' "$red" "No neutrino emission detected!" "$NC"
+        printf '\n%s%s %s%s\n\n' "${red}" " ${no_wifi}" " No neutrino emission detected!" "${NC}"
     fi
 }
-
