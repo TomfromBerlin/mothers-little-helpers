@@ -48,7 +48,13 @@ local HIBLUE=$'\e[0;94m'
 local HIPURPLE=$'\e[0;95m'
 local HICYAN=$'\e[0;96m'
 local HIWHITE=$'\e[0;97m'
-local NC=$'\e[0'
+local NC=$'\e[0m'
+
+printf '%s\n' " You can use these escape sequences to define your own variables."
+printf '%s\n' " The variables used in this script are defined locally and are"
+printf '%s\n' " therefore not globally available. The long names shown are for"
+printf '%s\n' " readability only; the variable names themselves are much shorter."
+printf '%s %s %s %s\n' " For example," "${HIRED}high intensity red${NC}" "is actually" "${HIRED}\$HIRED${NC}."
 
 printf '\n%s \t\t%s \t\t%s \t\t%s \t\t%s \t\t%s \t\t%s \t\t%s' "${RED}"' Red' "${GREEN}"'Green' "${YELLOW}"'Yellow' "${BlUE}"'Blue' "${PURPLE}"'Purple' "${CYAN}"'Cyan' "${WHITE}"'White' "${BLACK}"'Black'
 printf '\n%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' "${RED}"' \e[0;31m' "${GREEN}"'\e[0;32m' "${YELLOW}"'\e[0;33m' "${BlUE}"'\e[0;34m' "${PURPLE}"'\e[0;35m' "${CYAN}"'\e[0;36m' "${WHITE}"'\e[0;37m' "${BLACK}"'\e[0;30m'
